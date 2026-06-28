@@ -1,0 +1,3 @@
+{
+  "ignore": ["config/db.json", "*.test.js"]
+}

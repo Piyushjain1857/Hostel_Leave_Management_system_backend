@@ -1,0 +1,233 @@
+Connecting to MySQL server...
+MySQL Connection/Initialization Error: 
+⚠️ WARNING: MySQL database may not be running or accessible at localhost:3306.
+🔄 Bypassing to fully persistent LOCAL FILE database mode (db.json).
+[LOCAL FILE DB] Loaded persistent database from config/db.json
+🚀 API Server is running on port 5005
+📡 Access endpoints at http://localhost:5005
+[2026-06-04T09:45:08.623Z] POST request to: /warden/login
+[MOCK DB] Executing Query: "SELECT * FROM Wardens WHERE email = ?" with [ 'warden@college.edu' ]
+[MOCK DB] Executing Query: "INSERT INTO LoginHistory (userId, role, loginTime, ipAddress, browser) VALUES (?, ?, NOW(), ?, ?)" with [
+  1,
+  'warden',
+  '::1',
+  'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36'
+]
+[MOCK DB] Unhandled SQL Query matched: "insert into loginhistory (userid, role, logintime, ipaddress, browser) values (?, ?, now(), ?, ?)"
+[LOCAL FILE DB] Persisted state successfully to config/db.json
+[2026-06-04T09:45:09.657Z] GET request to: /warden/dashboard
+[MOCK DB] Executing Query: "SELECT * FROM LeaveRequests" with []
+[MOCK DB] Executing Query: "SELECT * FROM GateLogs" with []
+[MOCK DB] Executing Query: "SELECT id, name, hostelRoom FROM students" with []
+[2026-06-04T09:45:09.660Z] GET request to: /warden/dashboard
+[MOCK DB] Executing Query: "SELECT * FROM LeaveRequests" with []
+[MOCK DB] Executing Query: "SELECT * FROM GateLogs" with []
+[MOCK DB] Executing Query: "SELECT id, name, hostelRoom FROM students" with []
+[2026-06-04T09:45:09.662Z] GET request to: /tracking/students
+[MOCK DB] Executing Query: "SELECT gl.id, gl.exitTime, gl.entryTime, gl.leaveId, gl.status, s.name as studentName, s.hostelRoom FROM GateLogs gl JOIN students s ON gl.studentId = s.id ORDER BY gl.exitTime DESC" with []
+[2026-06-04T09:45:09.689Z] GET request to: /tracking/students
+[MOCK DB] Executing Query: "SELECT gl.id, gl.exitTime, gl.entryTime, gl.leaveId, gl.status, s.name as studentName, s.hostelRoom FROM GateLogs gl JOIN students s ON gl.studentId = s.id ORDER BY gl.exitTime DESC" with []
+[2026-06-04T09:45:09.690Z] GET request to: /reports/details
+[MOCK DB] Executing Query: "SELECT COUNT(*) as count FROM students" with []
+[MOCK DB] Executing Query: "SELECT * FROM LeaveRequests" with []
+[MOCK DB] Executing Query: "SELECT * FROM GateLogs" with []
+[2026-06-04T09:45:09.692Z] GET request to: /reports/details
+[MOCK DB] Executing Query: "SELECT COUNT(*) as count FROM students" with []
+[MOCK DB] Executing Query: "SELECT * FROM LeaveRequests" with []
+[MOCK DB] Executing Query: "SELECT * FROM GateLogs" with []
+[2026-06-04T09:45:09.694Z] GET request to: /warden/profile
+[MOCK DB] Executing Query: "SELECT id, name, email, phone, hostelAssigned, shift, profileImage FROM Wardens WHERE id = ?" with [ 1 ]
+[2026-06-04T09:45:09.698Z] GET request to: /warden/profile
+[MOCK DB] Executing Query: "SELECT id, name, email, phone, hostelAssigned, shift, profileImage FROM Wardens WHERE id = ?" with [ 1 ]
+[2026-06-04T09:45:14.175Z] GET request to: /warden/dashboard
+[MOCK DB] Executing Query: "SELECT * FROM LeaveRequests" with []
+[MOCK DB] Executing Query: "SELECT * FROM GateLogs" with []
+[MOCK DB] Executing Query: "SELECT id, name, hostelRoom FROM students" with []
+[2026-06-04T09:45:14.177Z] GET request to: /warden/dashboard
+[MOCK DB] Executing Query: "SELECT * FROM LeaveRequests" with []
+[MOCK DB] Executing Query: "SELECT * FROM GateLogs" with []
+[MOCK DB] Executing Query: "SELECT id, name, hostelRoom FROM students" with []
+[2026-06-04T09:45:14.181Z] GET request to: /tracking/students
+[MOCK DB] Executing Query: "SELECT gl.id, gl.exitTime, gl.entryTime, gl.leaveId, gl.status, s.name as studentName, s.hostelRoom FROM GateLogs gl JOIN students s ON gl.studentId = s.id ORDER BY gl.exitTime DESC" with []
+[2026-06-04T09:45:14.183Z] GET request to: /tracking/students
+[MOCK DB] Executing Query: "SELECT gl.id, gl.exitTime, gl.entryTime, gl.leaveId, gl.status, s.name as studentName, s.hostelRoom FROM GateLogs gl JOIN students s ON gl.studentId = s.id ORDER BY gl.exitTime DESC" with []
+[2026-06-04T09:45:14.185Z] GET request to: /reports/details
+[MOCK DB] Executing Query: "SELECT COUNT(*) as count FROM students" with []
+[MOCK DB] Executing Query: "SELECT * FROM LeaveRequests" with []
+[MOCK DB] Executing Query: "SELECT * FROM GateLogs" with []
+[2026-06-04T09:45:14.186Z] GET request to: /reports/details
+[MOCK DB] Executing Query: "SELECT COUNT(*) as count FROM students" with []
+[MOCK DB] Executing Query: "SELECT * FROM LeaveRequests" with []
+[MOCK DB] Executing Query: "SELECT * FROM GateLogs" with []
+[2026-06-04T09:45:14.187Z] GET request to: /warden/profile
+[MOCK DB] Executing Query: "SELECT id, name, email, phone, hostelAssigned, shift, profileImage FROM Wardens WHERE id = ?" with [ 1 ]
+[2026-06-04T09:45:14.191Z] GET request to: /warden/profile
+[MOCK DB] Executing Query: "SELECT id, name, email, phone, hostelAssigned, shift, profileImage FROM Wardens WHERE id = ?" with [ 1 ]
+[2026-06-04T09:45:15.040Z] GET request to: /warden/dashboard
+[MOCK DB] Executing Query: "SELECT * FROM LeaveRequests" with []
+[MOCK DB] Executing Query: "SELECT * FROM GateLogs" with []
+[MOCK DB] Executing Query: "SELECT id, name, hostelRoom FROM students" with []
+[2026-06-04T09:45:15.042Z] GET request to: /warden/dashboard
+[MOCK DB] Executing Query: "SELECT * FROM LeaveRequests" with []
+[MOCK DB] Executing Query: "SELECT * FROM GateLogs" with []
+[MOCK DB] Executing Query: "SELECT id, name, hostelRoom FROM students" with []
+[2026-06-04T09:45:15.048Z] GET request to: /tracking/students
+[MOCK DB] Executing Query: "SELECT gl.id, gl.exitTime, gl.entryTime, gl.leaveId, gl.status, s.name as studentName, s.hostelRoom FROM GateLogs gl JOIN students s ON gl.studentId = s.id ORDER BY gl.exitTime DESC" with []
+[2026-06-04T09:45:15.050Z] GET request to: /tracking/students
+[MOCK DB] Executing Query: "SELECT gl.id, gl.exitTime, gl.entryTime, gl.leaveId, gl.status, s.name as studentName, s.hostelRoom FROM GateLogs gl JOIN students s ON gl.studentId = s.id ORDER BY gl.exitTime DESC" with []
+[2026-06-04T09:45:15.053Z] GET request to: /reports/details
+[MOCK DB] Executing Query: "SELECT COUNT(*) as count FROM students" with []
+[MOCK DB] Executing Query: "SELECT * FROM LeaveRequests" with []
+[MOCK DB] Executing Query: "SELECT * FROM GateLogs" with []
+[2026-06-04T09:45:15.055Z] GET request to: /reports/details
+[MOCK DB] Executing Query: "SELECT COUNT(*) as count FROM students" with []
+[MOCK DB] Executing Query: "SELECT * FROM LeaveRequests" with []
+[MOCK DB] Executing Query: "SELECT * FROM GateLogs" with []
+[2026-06-04T09:45:15.059Z] GET request to: /warden/profile
+[MOCK DB] Executing Query: "SELECT id, name, email, phone, hostelAssigned, shift, profileImage FROM Wardens WHERE id = ?" with [ 1 ]
+[2026-06-04T09:45:15.063Z] GET request to: /warden/profile
+[MOCK DB] Executing Query: "SELECT id, name, email, phone, hostelAssigned, shift, profileImage FROM Wardens WHERE id = ?" with [ 1 ]
+[2026-06-04T09:45:15.291Z] GET request to: /warden/dashboard
+[MOCK DB] Executing Query: "SELECT * FROM LeaveRequests" with []
+[MOCK DB] Executing Query: "SELECT * FROM GateLogs" with []
+[MOCK DB] Executing Query: "SELECT id, name, hostelRoom FROM students" with []
+[2026-06-04T09:45:15.293Z] GET request to: /warden/dashboard
+[MOCK DB] Executing Query: "SELECT * FROM LeaveRequests" with []
+[MOCK DB] Executing Query: "SELECT * FROM GateLogs" with []
+[MOCK DB] Executing Query: "SELECT id, name, hostelRoom FROM students" with []
+[2026-06-04T09:45:15.299Z] GET request to: /tracking/students
+[MOCK DB] Executing Query: "SELECT gl.id, gl.exitTime, gl.entryTime, gl.leaveId, gl.status, s.name as studentName, s.hostelRoom FROM GateLogs gl JOIN students s ON gl.studentId = s.id ORDER BY gl.exitTime DESC" with []
+[2026-06-04T09:45:15.301Z] GET request to: /tracking/students
+[MOCK DB] Executing Query: "SELECT gl.id, gl.exitTime, gl.entryTime, gl.leaveId, gl.status, s.name as studentName, s.hostelRoom FROM GateLogs gl JOIN students s ON gl.studentId = s.id ORDER BY gl.exitTime DESC" with []
+[2026-06-04T09:45:15.303Z] GET request to: /reports/details
+[MOCK DB] Executing Query: "SELECT COUNT(*) as count FROM students" with []
+[MOCK DB] Executing Query: "SELECT * FROM LeaveRequests" with []
+[MOCK DB] Executing Query: "SELECT * FROM GateLogs" with []
+[2026-06-04T09:45:15.304Z] GET request to: /reports/details
+[MOCK DB] Executing Query: "SELECT COUNT(*) as count FROM students" with []
+[MOCK DB] Executing Query: "SELECT * FROM LeaveRequests" with []
+[MOCK DB] Executing Query: "SELECT * FROM GateLogs" with []
+[2026-06-04T09:45:15.306Z] GET request to: /warden/profile
+[MOCK DB] Executing Query: "SELECT id, name, email, phone, hostelAssigned, shift, profileImage FROM Wardens WHERE id = ?" with [ 1 ]
+[2026-06-04T09:45:15.310Z] GET request to: /warden/profile
+[MOCK DB] Executing Query: "SELECT id, name, email, phone, hostelAssigned, shift, profileImage FROM Wardens WHERE id = ?" with [ 1 ]
+[2026-06-04T09:45:15.495Z] GET request to: /warden/dashboard
+[MOCK DB] Executing Query: "SELECT * FROM LeaveRequests" with []
+[MOCK DB] Executing Query: "SELECT * FROM GateLogs" with []
+[MOCK DB] Executing Query: "SELECT id, name, hostelRoom FROM students" with []
+[2026-06-04T09:45:15.497Z] GET request to: /warden/dashboard
+[MOCK DB] Executing Query: "SELECT * FROM LeaveRequests" with []
+[MOCK DB] Executing Query: "SELECT * FROM GateLogs" with []
+[MOCK DB] Executing Query: "SELECT id, name, hostelRoom FROM students" with []
+[2026-06-04T09:45:15.502Z] GET request to: /tracking/students
+[MOCK DB] Executing Query: "SELECT gl.id, gl.exitTime, gl.entryTime, gl.leaveId, gl.status, s.name as studentName, s.hostelRoom FROM GateLogs gl JOIN students s ON gl.studentId = s.id ORDER BY gl.exitTime DESC" with []
+[2026-06-04T09:45:15.504Z] GET request to: /tracking/students
+[MOCK DB] Executing Query: "SELECT gl.id, gl.exitTime, gl.entryTime, gl.leaveId, gl.status, s.name as studentName, s.hostelRoom FROM GateLogs gl JOIN students s ON gl.studentId = s.id ORDER BY gl.exitTime DESC" with []
+[2026-06-04T09:45:15.508Z] GET request to: /reports/details
+[MOCK DB] Executing Query: "SELECT COUNT(*) as count FROM students" with []
+[MOCK DB] Executing Query: "SELECT * FROM LeaveRequests" with []
+[MOCK DB] Executing Query: "SELECT * FROM GateLogs" with []
+[2026-06-04T09:45:15.513Z] GET request to: /reports/details
+[MOCK DB] Executing Query: "SELECT COUNT(*) as count FROM students" with []
+[MOCK DB] Executing Query: "SELECT * FROM LeaveRequests" with []
+[MOCK DB] Executing Query: "SELECT * FROM GateLogs" with []
+[2026-06-04T09:45:15.514Z] GET request to: /warden/profile
+[MOCK DB] Executing Query: "SELECT id, name, email, phone, hostelAssigned, shift, profileImage FROM Wardens WHERE id = ?" with [ 1 ]
+[2026-06-04T09:45:15.522Z] GET request to: /warden/profile
+[MOCK DB] Executing Query: "SELECT id, name, email, phone, hostelAssigned, shift, profileImage FROM Wardens WHERE id = ?" with [ 1 ]
+[2026-06-04T09:45:15.706Z] GET request to: /warden/dashboard
+[MOCK DB] Executing Query: "SELECT * FROM LeaveRequests" with []
+[MOCK DB] Executing Query: "SELECT * FROM GateLogs" with []
+[MOCK DB] Executing Query: "SELECT id, name, hostelRoom FROM students" with []
+[2026-06-04T09:45:15.708Z] GET request to: /warden/dashboard
+[MOCK DB] Executing Query: "SELECT * FROM LeaveRequests" with []
+[MOCK DB] Executing Query: "SELECT * FROM GateLogs" with []
+[MOCK DB] Executing Query: "SELECT id, name, hostelRoom FROM students" with []
+[2026-06-04T09:45:15.719Z] GET request to: /tracking/students
+[MOCK DB] Executing Query: "SELECT gl.id, gl.exitTime, gl.entryTime, gl.leaveId, gl.status, s.name as studentName, s.hostelRoom FROM GateLogs gl JOIN students s ON gl.studentId = s.id ORDER BY gl.exitTime DESC" with []
+[2026-06-04T09:45:15.722Z] GET request to: /tracking/students
+[MOCK DB] Executing Query: "SELECT gl.id, gl.exitTime, gl.entryTime, gl.leaveId, gl.status, s.name as studentName, s.hostelRoom FROM GateLogs gl JOIN students s ON gl.studentId = s.id ORDER BY gl.exitTime DESC" with []
+[2026-06-04T09:45:15.727Z] GET request to: /reports/details
+[MOCK DB] Executing Query: "SELECT COUNT(*) as count FROM students" with []
+[MOCK DB] Executing Query: "SELECT * FROM LeaveRequests" with []
+[MOCK DB] Executing Query: "SELECT * FROM GateLogs" with []
+[2026-06-04T09:45:15.730Z] GET request to: /reports/details
+[MOCK DB] Executing Query: "SELECT COUNT(*) as count FROM students" with []
+[MOCK DB] Executing Query: "SELECT * FROM LeaveRequests" with []
+[MOCK DB] Executing Query: "SELECT * FROM GateLogs" with []
+[2026-06-04T09:45:15.737Z] GET request to: /warden/profile
+[MOCK DB] Executing Query: "SELECT id, name, email, phone, hostelAssigned, shift, profileImage FROM Wardens WHERE id = ?" with [ 1 ]
+[2026-06-04T09:45:15.742Z] GET request to: /warden/profile
+[MOCK DB] Executing Query: "SELECT id, name, email, phone, hostelAssigned, shift, profileImage FROM Wardens WHERE id = ?" with [ 1 ]
+[2026-06-04T09:45:16.136Z] GET request to: /warden/dashboard
+[MOCK DB] Executing Query: "SELECT * FROM LeaveRequests" with []
+[MOCK DB] Executing Query: "SELECT * FROM GateLogs" with []
+[MOCK DB] Executing Query: "SELECT id, name, hostelRoom FROM students" with []
+[2026-06-04T09:45:16.138Z] GET request to: /warden/dashboard
+[MOCK DB] Executing Query: "SELECT * FROM LeaveRequests" with []
+[MOCK DB] Executing Query: "SELECT * FROM GateLogs" with []
+[MOCK DB] Executing Query: "SELECT id, name, hostelRoom FROM students" with []
+[2026-06-04T09:45:16.142Z] GET request to: /tracking/students
+[MOCK DB] Executing Query: "SELECT gl.id, gl.exitTime, gl.entryTime, gl.leaveId, gl.status, s.name as studentName, s.hostelRoom FROM GateLogs gl JOIN students s ON gl.studentId = s.id ORDER BY gl.exitTime DESC" with []
+[2026-06-04T09:45:16.144Z] GET request to: /tracking/students
+[MOCK DB] Executing Query: "SELECT gl.id, gl.exitTime, gl.entryTime, gl.leaveId, gl.status, s.name as studentName, s.hostelRoom FROM GateLogs gl JOIN students s ON gl.studentId = s.id ORDER BY gl.exitTime DESC" with []
+[2026-06-04T09:45:16.147Z] GET request to: /reports/details
+[MOCK DB] Executing Query: "SELECT COUNT(*) as count FROM students" with []
+[MOCK DB] Executing Query: "SELECT * FROM LeaveRequests" with []
+[MOCK DB] Executing Query: "SELECT * FROM GateLogs" with []
+[2026-06-04T09:45:16.148Z] GET request to: /reports/details
+[MOCK DB] Executing Query: "SELECT COUNT(*) as count FROM students" with []
+[MOCK DB] Executing Query: "SELECT * FROM LeaveRequests" with []
+[MOCK DB] Executing Query: "SELECT * FROM GateLogs" with []
+[2026-06-04T09:45:16.149Z] GET request to: /warden/profile
+[MOCK DB] Executing Query: "SELECT id, name, email, phone, hostelAssigned, shift, profileImage FROM Wardens WHERE id = ?" with [ 1 ]
+[2026-06-04T09:45:16.153Z] GET request to: /warden/profile
+[MOCK DB] Executing Query: "SELECT id, name, email, phone, hostelAssigned, shift, profileImage FROM Wardens WHERE id = ?" with [ 1 ]
+[2026-06-04T09:45:16.397Z] GET request to: /warden/dashboard
+[MOCK DB] Executing Query: "SELECT * FROM LeaveRequests" with []
+[MOCK DB] Executing Query: "SELECT * FROM GateLogs" with []
+[MOCK DB] Executing Query: "SELECT id, name, hostelRoom FROM students" with []
+[2026-06-04T09:45:16.400Z] GET request to: /warden/dashboard
+[MOCK DB] Executing Query: "SELECT * FROM LeaveRequests" with []
+[MOCK DB] Executing Query: "SELECT * FROM GateLogs" with []
+[MOCK DB] Executing Query: "SELECT id, name, hostelRoom FROM students" with []
+[2026-06-04T09:45:16.402Z] GET request to: /tracking/students
+[MOCK DB] Executing Query: "SELECT gl.id, gl.exitTime, gl.entryTime, gl.leaveId, gl.status, s.name as studentName, s.hostelRoom FROM GateLogs gl JOIN students s ON gl.studentId = s.id ORDER BY gl.exitTime DESC" with []
+[2026-06-04T09:45:16.407Z] GET request to: /tracking/students
+[MOCK DB] Executing Query: "SELECT gl.id, gl.exitTime, gl.entryTime, gl.leaveId, gl.status, s.name as studentName, s.hostelRoom FROM GateLogs gl JOIN students s ON gl.studentId = s.id ORDER BY gl.exitTime DESC" with []
+[2026-06-04T09:45:16.408Z] GET request to: /reports/details
+[MOCK DB] Executing Query: "SELECT COUNT(*) as count FROM students" with []
+[MOCK DB] Executing Query: "SELECT * FROM LeaveRequests" with []
+[MOCK DB] Executing Query: "SELECT * FROM GateLogs" with []
+[2026-06-04T09:45:16.410Z] GET request to: /reports/details
+[MOCK DB] Executing Query: "SELECT COUNT(*) as count FROM students" with []
+[MOCK DB] Executing Query: "SELECT * FROM LeaveRequests" with []
+[MOCK DB] Executing Query: "SELECT * FROM GateLogs" with []
+[2026-06-04T09:45:16.417Z] GET request to: /warden/profile
+[MOCK DB] Executing Query: "SELECT id, name, email, phone, hostelAssigned, shift, profileImage FROM Wardens WHERE id = ?" with [ 1 ]
+[2026-06-04T09:45:16.421Z] GET request to: /warden/profile
+[MOCK DB] Executing Query: "SELECT id, name, email, phone, hostelAssigned, shift, profileImage FROM Wardens WHERE id = ?" with [ 1 ]
+[2026-06-04T09:45:21.435Z] GET request to: /warden/dashboard
+[MOCK DB] Executing Query: "SELECT * FROM LeaveRequests" with []
+[MOCK DB] Executing Query: "SELECT * FROM GateLogs" with []
+[MOCK DB] Executing Query: "SELECT id, name, hostelRoom FROM students" with []
+[2026-06-04T09:45:21.438Z] GET request to: /warden/dashboard
+[MOCK DB] Executing Query: "SELECT * FROM LeaveRequests" with []
+[MOCK DB] Executing Query: "SELECT * FROM GateLogs" with []
+[MOCK DB] Executing Query: "SELECT id, name, hostelRoom FROM students" with []
+[2026-06-04T09:45:21.441Z] GET request to: /tracking/students
+[MOCK DB] Executing Query: "SELECT gl.id, gl.exitTime, gl.entryTime, gl.leaveId, gl.status, s.name as studentName, s.hostelRoom FROM GateLogs gl JOIN students s ON gl.studentId = s.id ORDER BY gl.exitTime DESC" with []
+[2026-06-04T09:45:21.446Z] GET request to: /tracking/students
+[MOCK DB] Executing Query: "SELECT gl.id, gl.exitTime, gl.entryTime, gl.leaveId, gl.status, s.name as studentName, s.hostelRoom FROM GateLogs gl JOIN students s ON gl.studentId = s.id ORDER BY gl.exitTime DESC" with []
+[2026-06-04T09:45:21.447Z] GET request to: /reports/details
+[MOCK DB] Executing Query: "SELECT COUNT(*) as count FROM students" with []
+[MOCK DB] Executing Query: "SELECT * FROM LeaveRequests" with []
+[MOCK DB] Executing Query: "SELECT * FROM GateLogs" with []
+[2026-06-04T09:45:21.450Z] GET request to: /reports/details
+[MOCK DB] Executing Query: "SELECT COUNT(*) as count FROM students" with []
+[MOCK DB] Executing Query: "SELECT * FROM LeaveRequests" with []
+[MOCK DB] Executing Query: "SELECT * FROM GateLogs" with []
+[2026-06-04T09:45:21.450Z] GET request to: /warden/profile
+[MOCK DB] Executing Query: "SELECT id, name, email, phone, hostelAssigned, shift, profileImage FROM Wardens WHERE id = ?" with [ 1 ]
+[2026-06-04T09:45:21.454Z] GET request to: /warden/profile
+[MOCK DB] Executing Query: "SELECT id, name, email, phone, hostelAssigned, shift, profileImage FROM Wardens WHERE id = ?" with [ 1 ]
