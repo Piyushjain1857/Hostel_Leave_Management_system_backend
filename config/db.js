@@ -673,6 +673,16 @@ async function createTables() {
       await client.query(q);
     }
 
+    // Seed default Student if empty
+    const { rows: students } = await client.query('SELECT id FROM students LIMIT 1');
+    if (students.length === 0) {
+      console.log('Seeding default student to PostgreSQL...');
+      await client.query(
+        'INSERT INTO students (name, email, password, hostelRoom, phone, course, year, isVerified) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)',
+        ['Piyush jain', 'student@college.edu', bcrypt.hashSync('password123', 10), 'B-Block 402', '9876543210', 'B.Tech Computer Science', '3rd Year', true]
+      );
+    }
+
     // Seed default Parent if empty
     const { rows: parents } = await client.query('SELECT id FROM Parents LIMIT 1');
     if (parents.length === 0) {
