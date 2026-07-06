@@ -392,7 +392,7 @@ const loginStudent = async (req, res) => {
       { expiresIn: '24h' }
     );
 
-    await sendLoginAlert(student, 'student', req);
+    sendLoginAlert(student, 'student', req).catch(err => console.error('Login alert error:', err));
 
     res.json({
       message: 'Authentication successful.',
