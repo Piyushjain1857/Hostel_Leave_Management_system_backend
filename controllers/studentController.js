@@ -13,7 +13,7 @@ const getDashboardData = async (req, res) => {
 
     // 1. Fetch Student Profile details
     const studentRows = await db.query(
-      'SELECT id, name, email, hostelRoom, profileImage, coverImage, created_at FROM students WHERE id = ?',
+      'SELECT id, name, email, hostelRoom, profileImage, created_at FROM students WHERE id = ?',
       [studentId]
     );
 
@@ -25,15 +25,15 @@ const getDashboardData = async (req, res) => {
 
     // 2. Fetch statistics (Total, Approved, Pending counts) using SQL COUNT queries
     const totalCountResult = await db.query(
-      'SELECT COUNT(*) AS count FROM leave_requests WHERE student_id = ?',
+      'SELECT COUNT(*) AS count FROM LeaveRequests WHERE studentId = ?',
       [studentId]
     );
     const approvedCountResult = await db.query(
-      'SELECT COUNT(*) AS count FROM leave_requests WHERE student_id = ? AND status = \'Approved\'',
+      'SELECT COUNT(*) AS count FROM LeaveRequests WHERE studentId = ? AND status = \'Approved\'',
       [studentId]
     );
     const pendingCountResult = await db.query(
-      'SELECT COUNT(*) AS count FROM leave_requests WHERE student_id = ? AND status = \'Pending\'',
+      'SELECT COUNT(*) AS count FROM LeaveRequests WHERE studentId = ? AND status = \'Pending\'',
       [studentId]
     );
 
@@ -45,7 +45,7 @@ const getDashboardData = async (req, res) => {
 
     // 3. Fetch recent 5 leave requests
     const recentLeaves = await db.query(
-      'SELECT id, reason, startDate, endDate, status, created_at FROM leave_requests WHERE student_id = ? ORDER BY created_at DESC LIMIT 5',
+      'SELECT id, reason, fromDate AS "startDate", toDate AS "endDate", status, createdAt AS "created_at" FROM LeaveRequests WHERE studentId = ? ORDER BY createdAt DESC LIMIT 5',
       [studentId]
     );
 
@@ -74,7 +74,7 @@ const getLeavesList = async (req, res) => {
 
     // Fetch all leave records sorted by creation date descending
     const leaves = await db.query(
-      'SELECT id, reason, startDate, endDate, status, created_at FROM leave_requests WHERE student_id = ? ORDER BY created_at DESC',
+      'SELECT id, reason, fromDate AS "startDate", toDate AS "endDate", status, createdAt AS "created_at" FROM LeaveRequests WHERE studentId = ? ORDER BY createdAt DESC',
       [studentId]
     );
 
@@ -119,8 +119,8 @@ const applyLeave = async (req, res) => {
 
     // 3. Save to database using parameterized SQL INSERT
     const insertResult = await db.query(
-      'INSERT INTO leave_requests (student_id, reason, startDate, endDate) VALUES (?, ?, ?, ?)',
-      [studentId, reason, startDate, endDate]
+      'INSERT INTO LeaveRequests (studentId, reason, fromDate, toDate, destination, parentPhone) VALUES (?, ?, ?, ?, ?, ?)',
+      [studentId, reason, startDate, endDate, 'N/A', 'N/A']
     );
 
     res.status(201).json({
@@ -143,7 +143,7 @@ const getStudentProfile = async (req, res) => {
   try {
     const studentId = req.user.id;
     const rows = await db.query(
-      'SELECT id, name, email, phone, course, year, hostelRoom, profileImage, coverImage FROM students WHERE id = ?',
+      'SELECT id, name, email, phone, course, year, hostelRoom, profileImage FROM students WHERE id = ?',
       [studentId]
     );
 
@@ -187,8 +187,8 @@ const updateStudentProfile = async (req, res) => {
     }
 
     await db.query(
-      'UPDATE students SET name = ?, email = ?, phone = ?, course = ?, year = ?, hostelRoom = ?, profileImage = ?, coverImage = ? WHERE id = ?',
-      [name, email, phone || '', course || '', year || '', hostelRoom || '', profileImage || '', coverImage || '', studentId]
+      'UPDATE students SET name = ?, email = ?, phone = ?, course = ?, year = ?, hostelRoom = ?, profileImage = ? WHERE id = ?',
+      [name, email, phone || '', course || '', year || '', hostelRoom || '', profileImage || '', studentId]
     );
 
     res.json({ message: 'Profile updated successfully.' });
