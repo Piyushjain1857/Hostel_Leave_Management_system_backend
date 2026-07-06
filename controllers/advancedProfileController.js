@@ -109,11 +109,11 @@ exports.updateProfile = async (req, res) => {
       return res.status(400).json({ message: 'Advanced profile update only implemented for students currently' });
     }
 
-    const { name, email, phone, course, year, hostelRoom, profileImage } = req.body;
+    const { name, email, phone, course, year, hostelRoom, profileImage, coverImage } = req.body;
     
     await db.query(
-      `UPDATE students SET name = ?, email = ?, phone = ?, course = ?, year = ?, hostelRoom = ?, profileImage = ? WHERE id = ?`,
-      [name, email, phone, course, year, hostelRoom, profileImage, userId]
+      `UPDATE students SET name = ?, email = ?, phone = ?, course = ?, year = ?, hostelRoom = ?, profileImage = ?, coverImage = ? WHERE id = ?`,
+      [name, email, phone, course, year, hostelRoom, profileImage, coverImage, userId]
     );
 
     await db.query(`INSERT INTO ActivityLogs (userId, role, activity, ipAddress) VALUES (?, ?, ?, ?)`, 

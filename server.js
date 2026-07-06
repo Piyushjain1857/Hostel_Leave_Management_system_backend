@@ -57,8 +57,8 @@ app.use(cors());
 app.use(compression());
 
 // Body parser middleware with expanded limits to process Base64 image payloads in requests
-app.use(express.json({ limit: '2mb' }));
-app.use(express.urlencoded({ limit: '2mb', extended: true }));
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
 // Swagger API Documentation Setup
 const swaggerOptions = {

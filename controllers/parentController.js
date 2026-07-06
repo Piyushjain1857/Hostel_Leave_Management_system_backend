@@ -75,7 +75,7 @@ const getPendingLeaves = async (req, res) => {
 
     const studentId = parentRows[0].studentId;
     const leaves = await db.query(
-      'SELECT lr.id, lr.studentId, lr.reason, lr.fromDate, lr.toDate, lr.expectedTimeOut, lr.expectedTimeIn, lr.destination, lr.parentPhone, lr.status, s.name as studentName FROM LeaveRequests lr JOIN students s ON lr.studentId = s.id WHERE lr.studentId = ? AND lr.status = ? ORDER BY lr.createdAt DESC',
+      'SELECT lr.id, lr.studentId, lr.reason, lr.fromDate, lr.toDate, lr.expectedTimeOut, lr.expectedTimeIn, lr.destination, lr.parentPhone, lr.status, lr.createdAt, s.name as studentName FROM LeaveRequests lr JOIN students s ON lr.studentId = s.id WHERE lr.studentId = ? AND lr.status = ? ORDER BY lr.createdAt DESC',
       [studentId, 'Pending']
     );
 
@@ -306,7 +306,7 @@ const getParentLeaveHistory = async (req, res) => {
     const studentId = parentRows[0].studentId;
 
     const leaves = await db.query(
-      `SELECT lr.id, lr.reason, lr.fromDate, lr.toDate, lr.expectedTimeOut, lr.expectedTimeIn, lr.actualTimeOut, lr.actualTimeIn, lr.status, s.name as studentName 
+      `SELECT lr.id, lr.reason, lr.fromDate, lr.toDate, lr.expectedTimeOut, lr.expectedTimeIn, lr.actualTimeOut, lr.actualTimeIn, lr.status, lr.createdAt, s.name as studentName 
        FROM LeaveRequests lr
        JOIN students s ON lr.studentId = s.id
        WHERE lr.studentId = ?

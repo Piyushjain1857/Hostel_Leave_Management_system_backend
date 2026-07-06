@@ -13,7 +13,7 @@ const getDashboardData = async (req, res) => {
 
     // 1. Fetch Student Profile details
     const studentRows = await db.query(
-      'SELECT id, name, email, hostelRoom, profileImage, created_at FROM students WHERE id = ?',
+      'SELECT id, name, email, hostelRoom, profileImage, coverImage, created_at FROM students WHERE id = ?',
       [studentId]
     );
 
@@ -143,7 +143,7 @@ const getStudentProfile = async (req, res) => {
   try {
     const studentId = req.user.id;
     const rows = await db.query(
-      'SELECT id, name, email, phone, course, year, hostelRoom, profileImage FROM students WHERE id = ?',
+      'SELECT id, name, email, phone, course, year, hostelRoom, profileImage, coverImage FROM students WHERE id = ?',
       [studentId]
     );
 
@@ -187,8 +187,8 @@ const updateStudentProfile = async (req, res) => {
     }
 
     await db.query(
-      'UPDATE students SET name = ?, email = ?, phone = ?, course = ?, year = ?, hostelRoom = ?, profileImage = ? WHERE id = ?',
-      [name, email, phone || '', course || '', year || '', hostelRoom || '', profileImage || '', studentId]
+      'UPDATE students SET name = ?, email = ?, phone = ?, course = ?, year = ?, hostelRoom = ?, profileImage = ?, coverImage = ? WHERE id = ?',
+      [name, email, phone || '', course || '', year || '', hostelRoom || '', profileImage || '', coverImage || '', studentId]
     );
 
     res.json({ message: 'Profile updated successfully.' });

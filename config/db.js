@@ -394,6 +394,7 @@ async function createTables() {
       course VARCHAR(255) DEFAULT '',
       year VARCHAR(50) DEFAULT '',
       profileImage TEXT DEFAULT NULL,
+      coverImage TEXT DEFAULT NULL,
       isVerified BOOLEAN DEFAULT FALSE,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );`,
@@ -471,6 +472,7 @@ async function createTables() {
       title VARCHAR(255) NOT NULL,
       message TEXT NOT NULL,
       role VARCHAR(100) NOT NULL,
+      status VARCHAR(50) DEFAULT 'Unread',
       createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );`,
 

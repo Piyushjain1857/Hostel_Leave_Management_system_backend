@@ -67,7 +67,8 @@ const loginWarden = async (req, res) => {
 const getWardenDashboard = async (req, res) => {
   try {
     // 1. Fetch total leaves and count pendings
-    const leaves = await db.query('SELECT * FROM LeaveRequests');
+    const rawLeaves = await db.query('SELECT * FROM LeaveRequests');
+    const leaves = rawLeaves.map(l => ({ ...l, startDate: l.fromDate, endDate: l.toDate, created_at: l.createdAt }));
     const logs = await db.query('SELECT * FROM GateLogs');
 
     const total = leaves.length;
@@ -115,7 +116,8 @@ const getWardenDashboard = async (req, res) => {
  */
 const getWardenPending = async (req, res) => {
   try {
-    const leaves = await db.query('SELECT * FROM LeaveRequests WHERE status = ?', ['Pending']);
+    const rawLeaves = await db.query('SELECT * FROM LeaveRequests WHERE status = ?', ['Pending']);
+    const leaves = rawLeaves.map(l => ({ ...l, startDate: l.fromDate, endDate: l.toDate, created_at: l.createdAt }));
     const students = await db.query('SELECT id, name, hostelRoom FROM students');
     const studentMap = {};
     students.forEach(s => {
@@ -251,7 +253,8 @@ const approveLeave = async (req, res) => {
     }
 
     try {
-      const leaves = await db.query('SELECT * FROM LeaveRequests WHERE id = ?', [Number(id)]);
+      const rawLeaves = await db.query('SELECT * FROM LeaveRequests WHERE id = ?', [Number(id)]);
+      const leaves = rawLeaves.map(l => ({ ...l, startDate: l.fromDate, endDate: l.toDate, created_at: l.createdAt }));
       if (leaves.length > 0) {
         const leave = leaves[0];
         const students = await db.query('SELECT name, email FROM students WHERE id = ?', [leave.studentId]);
