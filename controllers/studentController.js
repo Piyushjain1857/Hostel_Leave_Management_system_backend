@@ -29,11 +29,11 @@ const getDashboardData = async (req, res) => {
       [studentId]
     );
     const approvedCountResult = await db.query(
-      'SELECT COUNT(*) AS count FROM leave_requests WHERE student_id = ? AND status = "Approved"',
+      'SELECT COUNT(*) AS count FROM leave_requests WHERE student_id = ? AND status = \'Approved\'',
       [studentId]
     );
     const pendingCountResult = await db.query(
-      'SELECT COUNT(*) AS count FROM leave_requests WHERE student_id = ? AND status = "Pending"',
+      'SELECT COUNT(*) AS count FROM leave_requests WHERE student_id = ? AND status = \'Pending\'',
       [studentId]
     );
 
