@@ -643,7 +643,7 @@ async function createTables() {
       device VARCHAR(255),
       browser VARCHAR(255),
       createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    );`
+    );`,
 
     // 19. Policies
     `CREATE TABLE IF NOT EXISTS Policies (
@@ -731,7 +731,7 @@ async function query(sql, params = []) {
     
     // Convert ? to $1, $2 etc.
     let i = 1;
-    pgSql = pgSql.replace(/\?/g, () => `${i++}`);
+    pgSql = pgSql.replace(/\?/g, () => '$' + (i++));
     
     // Automatically append RETURNING id for INSERT queries if not present
     const isInsert = pgSql.trim().toUpperCase().startsWith('INSERT');
