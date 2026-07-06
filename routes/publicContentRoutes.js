@@ -3,8 +3,15 @@ const router = express.Router();
 const db = require('../config/db');
 const { protect } = require('../middleware/authMiddleware');
 
+// Cache middleware for public routes
+const setCache = (req, res, next) => {
+  // Cache for 1 hour (3600 seconds)
+  res.set('Cache-Control', 'public, max-age=3600');
+  next();
+};
+
 // Get all policies (type = portal or hostel)
-router.get('/policies', async (req, res) => {
+router.get('/policies', setCache, async (req, res) => {
   try {
     const type = req.query.type;
     let query = 'SELECT * FROM Policies';
@@ -55,7 +62,7 @@ router.put('/policies', protect, async (req, res) => {
 });
 
 // Get warden directory cards
-router.get('/warden-directory', async (req, res) => {
+router.get('/warden-directory', setCache, async (req, res) => {
   try {
     const directory = await db.query('SELECT * FROM WardenDirectoryCards');
     res.json({ directory });

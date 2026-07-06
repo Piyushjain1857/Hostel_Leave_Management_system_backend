@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const compression = require('compression');
 require('dotenv').config({ override: true });
 const db = require('./config/db');
 const authRoutes = require('./routes/authRoutes');
@@ -49,6 +50,9 @@ const PORT = process.env.PORT || 5000;
 
 // Enable CORS so the React app can communicate with the backend
 app.use(cors());
+
+// Enable gzip compression for faster network transfer
+app.use(compression());
 
 // Body parser middleware with expanded limits to process Base64 image payloads in requests
 app.use(express.json({ limit: '2mb' }));
