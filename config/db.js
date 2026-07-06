@@ -263,7 +263,9 @@ let mockWardenDirectory = [
 ];
 
 
-function saveToFile() {
+let saveTimeout = null;
+
+async function performSave() {
   try {
     const data = {
       mockStudents,
@@ -296,11 +298,16 @@ function saveToFile() {
       mockHostelRules,
       mockWardenDirectory
     };
-    fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2), 'utf8');
+    await fs.promises.writeFile(DB_FILE, JSON.stringify(data, null, 2), 'utf8');
     console.log('[LOCAL FILE DB] Persisted state successfully to config/db.json');
   } catch (error) {
     console.error('[LOCAL FILE DB] Error saving database file:', error.message);
   }
+}
+
+function saveToFile() {
+  if (saveTimeout) clearTimeout(saveTimeout);
+  saveTimeout = setTimeout(performSave, 500);
 }
 
 function loadFromFile() {
@@ -349,7 +356,8 @@ async function initializeDatabase() {
   const connectionConfig = {
     host: process.env.DB_HOST || 'localhost',
     user: process.env.DB_USER || 'root',
-    password: process.env.DB_PASSWORD || ''
+    password: process.env.DB_PASSWORD || '',
+    connectTimeout: 2000 // 2 seconds timeout for fast fallback
   };
 
   try {

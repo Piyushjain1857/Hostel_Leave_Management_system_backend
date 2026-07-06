@@ -51,12 +51,14 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 
 // Body parser middleware with expanded limits to process Base64 image payloads in requests
-app.use(express.json({ limit: '50mb' }));
-app.use(express.urlencoded({ limit: '50mb', extended: true }));
+app.use(express.json({ limit: '2mb' }));
+app.use(express.urlencoded({ limit: '2mb', extended: true }));
 
-// Log incoming requests for debugging
+// Log incoming requests for debugging (disabled in production for performance)
 app.use((req, res, next) => {
-  console.log(`[${new Date().toISOString()}] ${req.method} request to: ${req.url}`);
+  if (process.env.NODE_ENV !== 'production') {
+    console.log(`[${new Date().toISOString()}] ${req.method} request to: ${req.url}`);
+  }
   next();
 });
 
