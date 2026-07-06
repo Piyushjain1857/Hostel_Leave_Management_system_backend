@@ -3,6 +3,13 @@ const router = express.Router();
 const db = require('../config/db');
 const { protect } = require('../middleware/authMiddleware');
 
+/**
+ * @swagger
+ * tags:
+ *   name: Public Content
+ *   description: Publicly accessible information
+ */
+
 // Cache middleware for public routes
 const setCache = (req, res, next) => {
   // Cache for 1 hour (3600 seconds)
@@ -10,7 +17,22 @@ const setCache = (req, res, next) => {
   next();
 };
 
-// Get all policies (type = portal or hostel)
+/**
+ * @swagger
+ * /public/policies:
+ *   get:
+ *     summary: Retrieve a list of policies
+ *     tags: [Public Content]
+ *     parameters:
+ *       - in: query
+ *         name: type
+ *         schema:
+ *           type: string
+ *         description: Filter policies by type (portal or hostel)
+ *     responses:
+ *       200:
+ *         description: A list of policies
+ */
 router.get('/policies', setCache, async (req, res) => {
   try {
     const type = req.query.type;
@@ -61,7 +83,16 @@ router.put('/policies', protect, async (req, res) => {
   }
 });
 
-// Get warden directory cards
+/**
+ * @swagger
+ * /public/warden-directory:
+ *   get:
+ *     summary: Retrieve the warden directory
+ *     tags: [Public Content]
+ *     responses:
+ *       200:
+ *         description: A list of wardens
+ */
 router.get('/warden-directory', setCache, async (req, res) => {
   try {
     const directory = await db.query('SELECT * FROM WardenDirectoryCards');

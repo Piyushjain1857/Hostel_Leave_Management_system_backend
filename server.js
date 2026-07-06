@@ -1,6 +1,8 @@
 const express = require('express');
 const cors = require('cors');
 const compression = require('compression');
+const swaggerUi = require('swagger-ui-express');
+const swaggerJsdoc = require('swagger-jsdoc');
 require('dotenv').config({ override: true });
 const db = require('./config/db');
 const authRoutes = require('./routes/authRoutes');
@@ -57,6 +59,41 @@ app.use(compression());
 // Body parser middleware with expanded limits to process Base64 image payloads in requests
 app.use(express.json({ limit: '2mb' }));
 app.use(express.urlencoded({ limit: '2mb', extended: true }));
+
+// Swagger API Documentation Setup
+const swaggerOptions = {
+  definition: {
+    openapi: '3.0.0',
+    info: {
+      title: 'Hostel Leave Management System API',
+      version: '1.0.0',
+      description: 'API documentation for the backend endpoints'
+    },
+    servers: [
+      {
+        url: `http://localhost:${PORT}`,
+        description: 'Local Development Server'
+      },
+      {
+        url: 'https://hostel-leave-management-system-backend.onrender.com',
+        description: 'Production Server'
+      }
+    ],
+    components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT'
+        }
+      }
+    }
+  },
+  apis: ['./routes/*.js']
+};
+
+const swaggerSpec = swaggerJsdoc(swaggerOptions);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // Log incoming requests for debugging (disabled in production for performance)
 app.use((req, res, next) => {
