@@ -712,7 +712,7 @@ async function createTables() {
         ['State Institute of Technology', 'Block-B Academic Hostel', 'admin.hostel@college.edu', '+91 9876543210']
       );
     }
-    
+
     // Seed Warden Directory
     const { rows: wardenDir } = await client.query('SELECT id FROM WardenDirectoryCards LIMIT 1');
     if (wardenDir.length === 0) {
@@ -729,7 +729,7 @@ async function createTables() {
         );
       }
     }
-    
+
     // Seed Policies
     const { rows: policies } = await client.query('SELECT id FROM Policies LIMIT 1');
     if (policies.length === 0) {
@@ -749,7 +749,7 @@ async function createTables() {
       for (const p of portalPolicies) {
         await client.query('INSERT INTO Policies (id, type, title, description) VALUES ($1, $2, $3, $4)', [p.id, 'portal', p.title, p.desc]);
       }
-      
+
       const hostelPolicies = [
         { id: 'h1', title: '1. Strict Night Curfew Hours', desc: 'All campus borders, main gates, and hostel block entrances are strictly shut down at 8:30 PM every night without exception. Students attempting late entries will be denied access to the block and must wait in the security lounge. Repeated late entries will trigger automated disciplinary logs which are instantly emailed to registered parents or guardians.' },
         { id: 'h2', title: '2. Outpass Application Deadlines', desc: 'All outpass applications must be submitted through this digital portal at least 24 hours prior to the requested leave start time. This buffer period is mandatory to guarantee that the Chief Warden has adequate time to review the request, cross-check academic schedules, and issue an approval.' },
