@@ -1,4 +1,4 @@
-const mysql = require('mysql2/promise');
+const { Pool } = require('pg');
 const bcrypt = require('bcryptjs');
 const fs = require('fs');
 const path = require('path');
@@ -353,36 +353,29 @@ function loadFromFile() {
 }
 
 async function initializeDatabase() {
-  const connectionConfig = {
-    host: process.env.DB_HOST || 'localhost',
-    user: process.env.DB_USER || 'root',
-    password: process.env.DB_PASSWORD || '',
-    connectTimeout: 2000 // 2 seconds timeout for fast fallback
-  };
+  const connectionString = process.env.DATABASE_URL;
+  if (!connectionString) {
+    console.warn('⚠️ WARNING: DATABASE_URL not set in environment.');
+    console.log('🔄 Bypassing to fully persistent LOCAL FILE database mode (db.json).');
+    loadFromFile();
+    return;
+  }
 
   try {
-    console.log('Connecting to MySQL server...');
-    const tempConnection = await mysql.createConnection(connectionConfig);
-
-    const dbName = process.env.DB_NAME || 'hostel_leave_db';
-    console.log(`Ensuring database "${dbName}" exists...`);
-    await tempConnection.query(`CREATE DATABASE IF NOT EXISTS \`${dbName}\``);
-    await tempConnection.end();
-
-    pool = mysql.createPool({
-      ...connectionConfig,
-      database: dbName,
-      waitForConnections: true,
-      connectionLimit: 10,
-      queueLimit: 0
+    console.log('Connecting to PostgreSQL server...');
+    pool = new Pool({
+      connectionString,
+      ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
     });
-
-    console.log(`Connected to MySQL database "${dbName}" pool.`);
+    
+    // Test connection
+    const client = await pool.connect();
+    console.log('Connected to PostgreSQL database pool.');
+    client.release();
+    
     await createTables();
-
   } catch (error) {
-    console.error('MySQL Connection/Initialization Error:', error.message);
-    console.warn('⚠️ WARNING: MySQL database may not be running or accessible at localhost:3306.');
+    console.error('PostgreSQL Connection/Initialization Error:', error.message);
     console.log('🔄 Bypassing to fully persistent LOCAL FILE database mode (db.json).');
     loadFromFile();
   }
@@ -392,7 +385,7 @@ async function createTables() {
   const queries = [
     // 1. Students Table (Expanded)
     `CREATE TABLE IF NOT EXISTS students (
-      id INT AUTO_INCREMENT PRIMARY KEY,
+      id SERIAL PRIMARY KEY,
       name VARCHAR(255) NOT NULL,
       email VARCHAR(255) UNIQUE NOT NULL,
       password VARCHAR(255) NOT NULL,
@@ -403,11 +396,11 @@ async function createTables() {
       profileImage TEXT DEFAULT NULL,
       isVerified BOOLEAN DEFAULT FALSE,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`,
+    );`,
 
     // 2. Parents Table (Expanded)
     `CREATE TABLE IF NOT EXISTS Parents (
-      id INT AUTO_INCREMENT PRIMARY KEY,
+      id SERIAL PRIMARY KEY,
       name VARCHAR(255) NOT NULL,
       email VARCHAR(255) UNIQUE NOT NULL,
       password VARCHAR(255) NOT NULL,
@@ -415,11 +408,11 @@ async function createTables() {
       studentId INT DEFAULT NULL,
       profileImage TEXT DEFAULT NULL,
       isVerified BOOLEAN DEFAULT FALSE
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`,
+    );`,
 
     // 3. Wardens Table (Expanded)
     `CREATE TABLE IF NOT EXISTS Wardens (
-      id INT AUTO_INCREMENT PRIMARY KEY,
+      id SERIAL PRIMARY KEY,
       name VARCHAR(255) NOT NULL,
       email VARCHAR(255) UNIQUE NOT NULL,
       password VARCHAR(255) NOT NULL,
@@ -428,20 +421,20 @@ async function createTables() {
       shift VARCHAR(100) DEFAULT '',
       profileImage TEXT DEFAULT NULL,
       isVerified BOOLEAN DEFAULT FALSE
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`,
+    );`,
 
     // 4. Admins Table (New)
     `CREATE TABLE IF NOT EXISTS Admins (
-      id INT AUTO_INCREMENT PRIMARY KEY,
+      id SERIAL PRIMARY KEY,
       name VARCHAR(255) NOT NULL,
       email VARCHAR(255) UNIQUE NOT NULL,
       password VARCHAR(255) NOT NULL,
       isVerified BOOLEAN DEFAULT FALSE
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`,
+    );`,
 
     // 5. LeaveRequests Table (Expanded)
     `CREATE TABLE IF NOT EXISTS LeaveRequests (
-      id INT AUTO_INCREMENT PRIMARY KEY,
+      id SERIAL PRIMARY KEY,
       studentId INT NOT NULL,
       reason TEXT NOT NULL,
       fromDate DATE NOT NULL,
@@ -450,19 +443,19 @@ async function createTables() {
       parentPhone VARCHAR(20) NOT NULL,
       expectedTimeOut TIME DEFAULT NULL,
       expectedTimeIn TIME DEFAULT NULL,
-      actualTimeOut DATETIME DEFAULT NULL,
-      actualTimeIn DATETIME DEFAULT NULL,
+      actualTimeOut TIMESTAMP DEFAULT NULL,
+      actualTimeIn TIMESTAMP DEFAULT NULL,
       status VARCHAR(50) DEFAULT 'Pending',
       parentStatus VARCHAR(50) DEFAULT 'Pending',
       wardenStatus VARCHAR(50) DEFAULT 'Pending',
       finalStatus VARCHAR(50) DEFAULT 'Pending',
       createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY (studentId) REFERENCES students(id) ON DELETE CASCADE
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`,
+    );`,
 
     // 6. GateLogs Table
     `CREATE TABLE IF NOT EXISTS GateLogs (
-      id INT AUTO_INCREMENT PRIMARY KEY,
+      id SERIAL PRIMARY KEY,
       studentId INT NOT NULL,
       leaveId INT NOT NULL,
       exitTime TIMESTAMP NULL DEFAULT NULL,
@@ -470,187 +463,187 @@ async function createTables() {
       status VARCHAR(50) NOT NULL,
       FOREIGN KEY (studentId) REFERENCES students(id) ON DELETE CASCADE,
       FOREIGN KEY (leaveId) REFERENCES LeaveRequests(id) ON DELETE CASCADE
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`,
+    );`,
 
     // 7. Notifications Table (New)
     `CREATE TABLE IF NOT EXISTS Notifications (
-      id INT AUTO_INCREMENT PRIMARY KEY,
+      id SERIAL PRIMARY KEY,
       title VARCHAR(255) NOT NULL,
       message TEXT NOT NULL,
       role VARCHAR(100) NOT NULL,
       createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`,
+    );`,
 
     // 8. Settings Table (New)
     `CREATE TABLE IF NOT EXISTS Settings (
-      id INT AUTO_INCREMENT PRIMARY KEY,
+      id SERIAL PRIMARY KEY,
       universityName VARCHAR(255) NOT NULL,
       hostelName VARCHAR(255) NOT NULL,
       contactEmail VARCHAR(255) NOT NULL,
       contactPhone VARCHAR(50) NOT NULL
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`,
+    );`,
 
     // 9. Feedback Table (New)
     `CREATE TABLE IF NOT EXISTS Feedback (
-      id INT AUTO_INCREMENT PRIMARY KEY,
+      id SERIAL PRIMARY KEY,
       userId INT NOT NULL,
       subject VARCHAR(255) NOT NULL,
       description TEXT NOT NULL,
       category VARCHAR(100) NOT NULL,
       status VARCHAR(50) DEFAULT 'Pending',
       createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`,
+    );`,
 
     // 10. SupportTickets Table (New)
     `CREATE TABLE IF NOT EXISTS SupportTickets (
-      id INT AUTO_INCREMENT PRIMARY KEY,
+      id SERIAL PRIMARY KEY,
       userId INT NOT NULL,
       subject VARCHAR(255) NOT NULL,
       description TEXT NOT NULL,
       status VARCHAR(50) DEFAULT 'Pending',
       createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`,
+    );`,
     
     // 11. ActivityLogs Table
     `CREATE TABLE IF NOT EXISTS ActivityLogs (
-      id INT AUTO_INCREMENT PRIMARY KEY,
+      id SERIAL PRIMARY KEY,
       userId INT NOT NULL,
       role VARCHAR(50) NOT NULL,
       activity TEXT NOT NULL,
       ipAddress VARCHAR(50),
       createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`,
+    );`,
     
     // 12. PasswordHistory Table
     `CREATE TABLE IF NOT EXISTS PasswordHistory (
-      id INT AUTO_INCREMENT PRIMARY KEY,
+      id SERIAL PRIMARY KEY,
       userId INT NOT NULL,
       role VARCHAR(50) NOT NULL,
       hashedPassword VARCHAR(255) NOT NULL,
       createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`,
+    );`,
     
     // 13. QRPasses Table
     `CREATE TABLE IF NOT EXISTS QRPasses (
-      id INT AUTO_INCREMENT PRIMARY KEY,
+      id SERIAL PRIMARY KEY,
       leaveId INT NOT NULL,
       qrCode TEXT NOT NULL,
       generatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       expiryDate TIMESTAMP NULL DEFAULT NULL,
       status VARCHAR(50) DEFAULT 'Active'
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`,
+    );`,
     
     // 14. Hostels Table
     `CREATE TABLE IF NOT EXISTS Hostels (
-      id INT AUTO_INCREMENT PRIMARY KEY,
+      id SERIAL PRIMARY KEY,
       hostelName VARCHAR(255) NOT NULL,
       capacity INT DEFAULT 0,
       occupiedRooms INT DEFAULT 0,
       wardenId INT DEFAULT NULL
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`,
+    );`,
     
     // 15. Rooms Table
     `CREATE TABLE IF NOT EXISTS Rooms (
-      id INT AUTO_INCREMENT PRIMARY KEY,
+      id SERIAL PRIMARY KEY,
       roomNumber VARCHAR(50) NOT NULL,
       hostelId INT NOT NULL,
       capacity INT DEFAULT 1,
       occupied INT DEFAULT 0,
       FOREIGN KEY (hostelId) REFERENCES Hostels(id) ON DELETE CASCADE
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`,
+    );`,
     
     // Screens 41-48 Tables
     `CREATE TABLE IF NOT EXISTS Roles (
-      id INT AUTO_INCREMENT PRIMARY KEY,
+      id SERIAL PRIMARY KEY,
       roleName VARCHAR(50) NOT NULL UNIQUE,
       permissions TEXT NOT NULL
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`,
+    );`,
     
     `CREATE TABLE IF NOT EXISTS Attendance (
-      id INT AUTO_INCREMENT PRIMARY KEY,
+      id SERIAL PRIMARY KEY,
       studentId INT NOT NULL,
-      checkInTime DATETIME,
-      checkOutTime DATETIME,
+      checkInTime TIMESTAMP,
+      checkOutTime TIMESTAMP,
       date DATE NOT NULL,
       status VARCHAR(50) DEFAULT 'Present'
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`,
+    );`,
     
     `CREATE TABLE IF NOT EXISTS EmergencyContacts (
-      id INT AUTO_INCREMENT PRIMARY KEY,
+      id SERIAL PRIMARY KEY,
       studentId INT NOT NULL,
       name VARCHAR(255) NOT NULL,
       relation VARCHAR(100) NOT NULL,
       phone VARCHAR(20) NOT NULL,
       address TEXT NOT NULL
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`,
+    );`,
     
     `CREATE TABLE IF NOT EXISTS Visitors (
-      id INT AUTO_INCREMENT PRIMARY KEY,
+      id SERIAL PRIMARY KEY,
       visitorName VARCHAR(255) NOT NULL,
       phone VARCHAR(20) NOT NULL,
       studentId INT NOT NULL,
       purpose TEXT NOT NULL,
       visitDate DATE NOT NULL,
       status VARCHAR(50) DEFAULT 'Pending'
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`,
+    );`,
     
     `CREATE TABLE IF NOT EXISTS RoomAllocations (
-      id INT AUTO_INCREMENT PRIMARY KEY,
+      id SERIAL PRIMARY KEY,
       studentId INT NOT NULL,
       roomId INT NOT NULL,
       allocationDate DATE NOT NULL
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`,
+    );`,
     
     `CREATE TABLE IF NOT EXISTS AuditLogs (
-      id INT AUTO_INCREMENT PRIMARY KEY,
+      id SERIAL PRIMARY KEY,
       userId INT NOT NULL,
       action VARCHAR(255) NOT NULL,
       module VARCHAR(100) NOT NULL,
       timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`,
+    );`,
     
     `CREATE TABLE IF NOT EXISTS Announcements (
-      id INT AUTO_INCREMENT PRIMARY KEY,
+      id SERIAL PRIMARY KEY,
       title VARCHAR(255) NOT NULL,
       description TEXT NOT NULL,
       priority VARCHAR(50) DEFAULT 'Normal',
       postedBy VARCHAR(100) NOT NULL,
       createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`,
+    );`,
     
     // 16. EmailVerification
     `CREATE TABLE IF NOT EXISTS EmailVerification (
-      id INT AUTO_INCREMENT PRIMARY KEY,
+      id SERIAL PRIMARY KEY,
       userId INT NOT NULL,
       role VARCHAR(50) NOT NULL,
       email VARCHAR(255) NOT NULL,
       otp VARCHAR(10) NOT NULL,
       isVerified BOOLEAN DEFAULT FALSE,
-      expiresAt DATETIME NOT NULL,
+      expiresAt TIMESTAMP NOT NULL,
       createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`,
+    );`,
 
     // 17. PasswordResetOTP
     `CREATE TABLE IF NOT EXISTS PasswordResetOTP (
-      id INT AUTO_INCREMENT PRIMARY KEY,
+      id SERIAL PRIMARY KEY,
       email VARCHAR(255) NOT NULL,
       role VARCHAR(50) NOT NULL,
       otp VARCHAR(10) NOT NULL,
-      expiresAt DATETIME NOT NULL,
+      expiresAt TIMESTAMP NOT NULL,
       createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`,
+    );`,
 
     // 18. LoginHistory
     `CREATE TABLE IF NOT EXISTS LoginHistory (
-      id INT AUTO_INCREMENT PRIMARY KEY,
+      id SERIAL PRIMARY KEY,
       userId INT NOT NULL,
       role VARCHAR(50) NOT NULL,
-      loginTime DATETIME NOT NULL,
+      loginTime TIMESTAMP NOT NULL,
       ipAddress VARCHAR(50),
       device VARCHAR(255),
       browser VARCHAR(255),
       createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`
+    );`
 
     // 19. Policies
     `CREATE TABLE IF NOT EXISTS Policies (
@@ -658,7 +651,7 @@ async function createTables() {
       type VARCHAR(50) NOT NULL,
       title VARCHAR(255) NOT NULL,
       description TEXT NOT NULL
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`,
+    );`,
 
     // 20. WardenDirectoryCards
     `CREATE TABLE IF NOT EXISTS WardenDirectoryCards (
@@ -670,57 +663,57 @@ async function createTables() {
       email VARCHAR(255) NOT NULL,
       color VARCHAR(50) NOT NULL,
       initials VARCHAR(10) NOT NULL
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`
+    );`
   ];
 
   try {
-    const connection = await pool.getConnection();
-    console.log('Verifying and creating all MySQL tables...');
+    const client = await pool.connect();
+    console.log('Verifying and creating all PostgreSQL tables...');
     for (const q of queries) {
-      await connection.query(q);
+      await client.query(q);
     }
 
     // Seed default Parent if empty
-    const [parents] = await connection.query('SELECT id FROM Parents LIMIT 1');
+    const [parents] = await client.query('SELECT id FROM Parents LIMIT 1');
     if (parents.length === 0) {
-      console.log('Seeding default parent to MySQL...');
-      await connection.query(
+      console.log('Seeding default parent to PostgreSQL...');
+      await client.query(
         'INSERT INTO Parents (name, email, password, phone, studentId, isVerified) VALUES (?, ?, ?, ?, ?, ?)',
         ['Parent Test', 'parent@college.edu', bcrypt.hashSync('password123', 10), '9876543211', 1, true]
       );
     }
 
     // Seed default Warden if empty
-    const [wardens] = await connection.query('SELECT id FROM Wardens LIMIT 1');
+    const [wardens] = await client.query('SELECT id FROM Wardens LIMIT 1');
     if (wardens.length === 0) {
-      console.log('Seeding default warden to MySQL...');
-      await connection.query(
+      console.log('Seeding default warden to PostgreSQL...');
+      await client.query(
         'INSERT INTO Wardens (name, email, password, phone, hostelAssigned, shift, isVerified) VALUES (?, ?, ?, ?, ?, ?, ?)',
         ['Warden Test', 'warden@college.edu', bcrypt.hashSync('password123', 10), '9876543212', 'B-Block', 'Day Shift', true]
       );
     }
 
     // Seed default Admin if empty
-    const [admins] = await connection.query('SELECT id FROM Admins LIMIT 1');
+    const [admins] = await client.query('SELECT id FROM Admins LIMIT 1');
     if (admins.length === 0) {
-      console.log('Seeding default admin to MySQL...');
-      await connection.query(
+      console.log('Seeding default admin to PostgreSQL...');
+      await client.query(
         'INSERT INTO Admins (name, email, password, isVerified) VALUES (?, ?, ?, ?)',
         ['Admin Test', 'admin@college.edu', bcrypt.hashSync('password123', 10), true]
       );
     }
 
     // Seed default Settings if empty
-    const [settings] = await connection.query('SELECT id FROM Settings LIMIT 1');
+    const [settings] = await client.query('SELECT id FROM Settings LIMIT 1');
     if (settings.length === 0) {
-      console.log('Seeding default settings to MySQL...');
-      await connection.query(
+      console.log('Seeding default settings to PostgreSQL...');
+      await client.query(
         'INSERT INTO Settings (universityName, hostelName, contactEmail, contactPhone) VALUES (?, ?, ?, ?)',
         ['State Institute of Technology', 'Block-B Academic Hostel', 'admin.hostel@college.edu', '+91 9876543210']
       );
     }
 
-    connection.release();
+    client.release();
     console.log('Database tables verified and seeded successfully.');
   } catch (error) {
     console.error('Error creating database tables:', error.message);
@@ -731,8 +724,40 @@ async function createTables() {
 // In-Memory Query Router & Matcher (Upgraded for Screens 11 to 20 CRUDs)
 async function query(sql, params = []) {
   if (pool) {
-    const [results] = await pool.execute(sql, params);
-    return results;
+    let pgSql = sql;
+    
+    // Convert MySQL backticks to double quotes
+    pgSql = pgSql.replace(/`/g, '"');
+    
+    // Convert ? to $1, $2 etc.
+    let i = 1;
+    pgSql = pgSql.replace(/\?/g, () => `${i++}`);
+    
+    // Automatically append RETURNING id for INSERT queries if not present
+    const isInsert = pgSql.trim().toUpperCase().startsWith('INSERT');
+    if (isInsert && !pgSql.toUpperCase().includes('RETURNING')) {
+      pgSql += ' RETURNING id';
+    }
+    
+    try {
+      const res = await pool.query(pgSql, params);
+      if (isInsert) {
+        return { 
+          insertId: res.rows && res.rows[0] ? res.rows[0].id : null,
+          affectedRows: res.rowCount 
+        };
+      }
+      
+      const isUpdateOrDelete = pgSql.trim().toUpperCase().startsWith('UPDATE') || pgSql.trim().toUpperCase().startsWith('DELETE');
+      if (isUpdateOrDelete) {
+        return { affectedRows: res.rowCount };
+      }
+      
+      return res.rows;
+    } catch (e) {
+      console.error('[DB ERROR] Query:', pgSql, 'Params:', params, 'Error:', e.message);
+      throw e;
+    }
   }
 
   const normalized = sql.trim().replace(/\s+/g, ' ').toLowerCase();
