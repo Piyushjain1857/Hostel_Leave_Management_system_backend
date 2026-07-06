@@ -367,12 +367,12 @@ async function initializeDatabase() {
       connectionString,
       ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
     });
-    
+
     // Test connection
     const client = await pool.connect();
     console.log('Connected to PostgreSQL database pool.');
     client.release();
-    
+
     await createTables();
   } catch (error) {
     console.error('PostgreSQL Connection/Initialization Error:', error.message);
@@ -503,7 +503,7 @@ async function createTables() {
       status VARCHAR(50) DEFAULT 'Pending',
       createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );`,
-    
+
     // 11. ActivityLogs Table
     `CREATE TABLE IF NOT EXISTS ActivityLogs (
       id SERIAL PRIMARY KEY,
@@ -513,7 +513,7 @@ async function createTables() {
       ipAddress VARCHAR(50),
       createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );`,
-    
+
     // 12. PasswordHistory Table
     `CREATE TABLE IF NOT EXISTS PasswordHistory (
       id SERIAL PRIMARY KEY,
@@ -522,7 +522,7 @@ async function createTables() {
       hashedPassword VARCHAR(255) NOT NULL,
       createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );`,
-    
+
     // 13. QRPasses Table
     `CREATE TABLE IF NOT EXISTS QRPasses (
       id SERIAL PRIMARY KEY,
@@ -532,7 +532,7 @@ async function createTables() {
       expiryDate TIMESTAMP NULL DEFAULT NULL,
       status VARCHAR(50) DEFAULT 'Active'
     );`,
-    
+
     // 14. Hostels Table
     `CREATE TABLE IF NOT EXISTS Hostels (
       id SERIAL PRIMARY KEY,
@@ -541,7 +541,7 @@ async function createTables() {
       occupiedRooms INT DEFAULT 0,
       wardenId INT DEFAULT NULL
     );`,
-    
+
     // 15. Rooms Table
     `CREATE TABLE IF NOT EXISTS Rooms (
       id SERIAL PRIMARY KEY,
@@ -551,14 +551,14 @@ async function createTables() {
       occupied INT DEFAULT 0,
       FOREIGN KEY (hostelId) REFERENCES Hostels(id) ON DELETE CASCADE
     );`,
-    
+
     // Screens 41-48 Tables
     `CREATE TABLE IF NOT EXISTS Roles (
       id SERIAL PRIMARY KEY,
       roleName VARCHAR(50) NOT NULL UNIQUE,
       permissions TEXT NOT NULL
     );`,
-    
+
     `CREATE TABLE IF NOT EXISTS Attendance (
       id SERIAL PRIMARY KEY,
       studentId INT NOT NULL,
@@ -567,7 +567,7 @@ async function createTables() {
       date DATE NOT NULL,
       status VARCHAR(50) DEFAULT 'Present'
     );`,
-    
+
     `CREATE TABLE IF NOT EXISTS EmergencyContacts (
       id SERIAL PRIMARY KEY,
       studentId INT NOT NULL,
@@ -576,7 +576,7 @@ async function createTables() {
       phone VARCHAR(20) NOT NULL,
       address TEXT NOT NULL
     );`,
-    
+
     `CREATE TABLE IF NOT EXISTS Visitors (
       id SERIAL PRIMARY KEY,
       visitorName VARCHAR(255) NOT NULL,
@@ -586,14 +586,14 @@ async function createTables() {
       visitDate DATE NOT NULL,
       status VARCHAR(50) DEFAULT 'Pending'
     );`,
-    
+
     `CREATE TABLE IF NOT EXISTS RoomAllocations (
       id SERIAL PRIMARY KEY,
       studentId INT NOT NULL,
       roomId INT NOT NULL,
       allocationDate DATE NOT NULL
     );`,
-    
+
     `CREATE TABLE IF NOT EXISTS AuditLogs (
       id SERIAL PRIMARY KEY,
       userId INT NOT NULL,
@@ -601,7 +601,7 @@ async function createTables() {
       module VARCHAR(100) NOT NULL,
       timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );`,
-    
+
     `CREATE TABLE IF NOT EXISTS Announcements (
       id SERIAL PRIMARY KEY,
       title VARCHAR(255) NOT NULL,
@@ -610,7 +610,7 @@ async function createTables() {
       postedBy VARCHAR(100) NOT NULL,
       createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );`,
-    
+
     // 16. EmailVerification
     `CREATE TABLE IF NOT EXISTS EmailVerification (
       id SERIAL PRIMARY KEY,
@@ -643,10 +643,10 @@ async function createTables() {
       device VARCHAR(255),
       browser VARCHAR(255),
       createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    );`,
+    );`
 
-    // 19. Policies
-    `CREATE TABLE IF NOT EXISTS Policies (
+      // 19. Policies
+      `CREATE TABLE IF NOT EXISTS Policies (
       id VARCHAR(50) PRIMARY KEY,
       type VARCHAR(50) NOT NULL,
       title VARCHAR(255) NOT NULL,
@@ -674,43 +674,94 @@ async function createTables() {
     }
 
     // Seed default Parent if empty
-    const [parents] = await client.query('SELECT id FROM Parents LIMIT 1');
+    const { rows: parents } = await client.query('SELECT id FROM Parents LIMIT 1');
     if (parents.length === 0) {
       console.log('Seeding default parent to PostgreSQL...');
       await client.query(
-        'INSERT INTO Parents (name, email, password, phone, studentId, isVerified) VALUES (?, ?, ?, ?, ?, ?)',
+        'INSERT INTO Parents (name, email, password, phone, studentId, isVerified) VALUES ($1, $2, $3, $4, $5, $6)',
         ['Parent Test', 'parent@college.edu', bcrypt.hashSync('password123', 10), '9876543211', 1, true]
       );
     }
 
     // Seed default Warden if empty
-    const [wardens] = await client.query('SELECT id FROM Wardens LIMIT 1');
+    const { rows: wardens } = await client.query('SELECT id FROM Wardens LIMIT 1');
     if (wardens.length === 0) {
       console.log('Seeding default warden to PostgreSQL...');
       await client.query(
-        'INSERT INTO Wardens (name, email, password, phone, hostelAssigned, shift, isVerified) VALUES (?, ?, ?, ?, ?, ?, ?)',
+        'INSERT INTO Wardens (name, email, password, phone, hostelAssigned, shift, isVerified) VALUES ($1, $2, $3, $4, $5, $6, $7)',
         ['Warden Test', 'warden@college.edu', bcrypt.hashSync('password123', 10), '9876543212', 'B-Block', 'Day Shift', true]
       );
     }
 
     // Seed default Admin if empty
-    const [admins] = await client.query('SELECT id FROM Admins LIMIT 1');
+    const { rows: admins } = await client.query('SELECT id FROM Admins LIMIT 1');
     if (admins.length === 0) {
       console.log('Seeding default admin to PostgreSQL...');
       await client.query(
-        'INSERT INTO Admins (name, email, password, isVerified) VALUES (?, ?, ?, ?)',
+        'INSERT INTO Admins (name, email, password, isVerified) VALUES ($1, $2, $3, $4)',
         ['Admin Test', 'admin@college.edu', bcrypt.hashSync('password123', 10), true]
       );
     }
 
     // Seed default Settings if empty
-    const [settings] = await client.query('SELECT id FROM Settings LIMIT 1');
+    const { rows: settings } = await client.query('SELECT id FROM Settings LIMIT 1');
     if (settings.length === 0) {
       console.log('Seeding default settings to PostgreSQL...');
       await client.query(
-        'INSERT INTO Settings (universityName, hostelName, contactEmail, contactPhone) VALUES (?, ?, ?, ?)',
+        'INSERT INTO Settings (universityName, hostelName, contactEmail, contactPhone) VALUES ($1, $2, $3, $4)',
         ['State Institute of Technology', 'Block-B Academic Hostel', 'admin.hostel@college.edu', '+91 9876543210']
       );
+    }
+    
+    // Seed Warden Directory
+    const { rows: wardenDir } = await client.query('SELECT id FROM WardenDirectoryCards LIMIT 1');
+    if (wardenDir.length === 0) {
+      console.log('Seeding warden directory to PostgreSQL...');
+      const wardensList = [
+        { id: 'w1', role: 'Chief Authority', name: 'Dr. Anil jain Sharma', location: 'Main Campus Office', phone: '+91 98765 43210', email: 'warden.chief@college.edu', color: 'primary', initials: 'AJ' },
+        { id: 'w2', role: 'Block A & B', name: 'Prof. Suresh Chandra', location: 'Ground Floor, Block A', phone: '+91 91234 56789', email: 'warden.blockab@college.edu', color: 'secondary', initials: 'SC' },
+        { id: 'w3', role: 'Block C & D', name: 'Prof. Mahendra Pal', location: 'First Floor, Block C', phone: '+91 99887 76655', email: 'warden.blockcd@college.edu', color: 'warning', initials: 'MP' }
+      ];
+      for (const w of wardensList) {
+        await client.query(
+          'INSERT INTO WardenDirectoryCards (id, role, name, location, phone, email, color, initials) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)',
+          [w.id, w.role, w.name, w.location, w.phone, w.email, w.color, w.initials]
+        );
+      }
+    }
+    
+    // Seed Policies
+    const { rows: policies } = await client.query('SELECT id FROM Policies LIMIT 1');
+    if (policies.length === 0) {
+      console.log('Seeding policies to PostgreSQL...');
+      const portalPolicies = [
+        { id: 'p1', title: '1. Use of Authentic Credentials Only', desc: 'Access to this digital portal is strictly restricted to your authorized @college.edu institutional email address. Do not attempt to register secondary accounts or use personal email addresses. Doing so will result in an automatic account suspension.' },
+        { id: 'p2', title: '2. Strict Parent Account Linking Protocols', desc: 'You must ensure your correct parent or guardian email is registered in the system for outpass approvals. Falsifying parent emails, creating fake proxy accounts, or approving your own outpasses is considered a severe disciplinary offense.' },
+        { id: 'p3', title: '3. Maintaining Profile Accuracy', desc: 'It is the student\'s responsibility to keep their emergency contact numbers, blood group, and allocated room details updated in the Profile section. Outpass applications may be automatically rejected by the system if the profile data is found to be incomplete or mismatched.' },
+        { id: 'p4', title: '4. Dynamic QR Gate Pass Integrity', desc: 'Do not screenshot, screen-record, or share your QR gate passes. The QR codes rotate dynamically every few seconds. Presenting an old or static screenshot at the security scanner will trigger an immediate security alert and block your exit.' },
+        { id: 'p5', title: '5. Honesty in Leave Applications', desc: 'Providing false reasons, fabricated medical certificates, or fake destination addresses for leave applications will result in a permanent ban from using the digital portal. All applications are subject to random verification calls to parents.' },
+        { id: 'p6', title: '6. Account Password Security', desc: 'You are required to change your access passkey every 90 days. Never share your password or OTPs with peers, seniors, or even administration staff. You are entirely responsible for any outpass generated from your logged-in session.' },
+        { id: 'p7', title: '7. Mandatory Gate Scanning Protocol', desc: 'When entering or exiting the campus, you must physically present your own device to the security guard to scan the QR code. Tailgating behind another student without scanning your own pass will flag you as an unauthorized absconder.' },
+        { id: 'p8', title: '8. Status Acknowledgement and Bulletins', desc: 'Students are expected to frequently check the Announcements tab. You must manually click and mark critical bulletins as "Read" to acknowledge receipt of important administrative notices. Ignorance of a published rule is not an acceptable excuse.' },
+        { id: 'p9', title: '9. Automated Session Timeouts', desc: 'For your security, the portal will automatically log you out after 30 minutes of inactivity. If you are using a shared computer in the library or computer lab, you must ensure you manually log out and close the browser window.' },
+        { id: 'p10', title: '10. Proper Issue Reporting Channels', desc: 'If you experience bugs, application crashes, or approval delays exceeding 48 hours, do not create duplicate outpass requests. Instead, raise a detailed technical ticket via the Support Hub tab so the IT team can resolve the underlying issue.' }
+      ];
+      for (const p of portalPolicies) {
+        await client.query('INSERT INTO Policies (id, type, title, description) VALUES ($1, $2, $3, $4)', [p.id, 'portal', p.title, p.desc]);
+      }
+      
+      const hostelPolicies = [
+        { id: 'h1', title: '1. Strict Night Curfew Hours', desc: 'All campus borders, main gates, and hostel block entrances are strictly shut down at 8:30 PM every night without exception. Students attempting late entries will be denied access to the block and must wait in the security lounge. Repeated late entries will trigger automated disciplinary logs which are instantly emailed to registered parents or guardians.' },
+        { id: 'h2', title: '2. Outpass Application Deadlines', desc: 'All outpass applications must be submitted through this digital portal at least 24 hours prior to the requested leave start time. This buffer period is mandatory to guarantee that the Chief Warden has adequate time to review the request, cross-check academic schedules, and issue an approval.' },
+        { id: 'h3', title: '3. Mandatory Biometric Attendance Checks', desc: 'Biometric fingerprint scanning is actively enforced in all block lobbies from 9:00 PM to 9:30 PM daily. It is the absolute responsibility of the student to ensure their attendance is marked. Unmarked absences, even if the student is inside the room, will incur heavy penalty fines and a potential suspension of outpass privileges.' },
+        { id: 'h4', title: '4. Enforcement of Silence Hours', desc: 'Strict silence must be maintained in all corridors, common rooms, and residential rooms from 10:00 PM to 6:00 AM. This policy respects the study and sleep schedules of all residents. Playing loud music, shouting across hallways, or gathering in large noisy groups during these hours will lead to confiscation of speakers and disciplinary action.' },
+        { id: 'h5', title: '5. Comprehensive Visitor Policy', desc: 'Under no circumstances are outside visitors, including day-scholars and family members, permitted inside individual student rooms. All visitors must be registered at the main gate and can only be entertained in the designated ground-floor visitor lounges during approved visiting hours (4:00 PM to 7:00 PM).' },
+        { id: 'h6', title: '6. Room Cleanliness and Maintenance', desc: 'Students are held responsible for the daily tidiness and hygiene of their allocated rooms. Surprise inspections are conducted weekly by the block wardens. Rooms found with accumulated garbage, unhygienic conditions, or damaged furniture will result in maintenance fines levied equally among the room\'s occupants.' },
+        { id: 'h7', title: '7. Prohibition of Heavy Electrical Appliances', desc: 'To prevent severe fire hazards and power tripping, heavy electrical appliances such as induction stoves, room heaters, electric kettles, and irons are strictly prohibited in student rooms. Only laptops, mobile chargers, and small table lamps are permitted. Confiscated items will not be returned until the end of the semester.' }
+      ];
+      for (const p of hostelPolicies) {
+        await client.query('INSERT INTO Policies (id, type, title, description) VALUES ($1, $2, $3, $4)', [p.id, 'hostel', p.title, p.desc]);
+      }
     }
 
     client.release();
@@ -725,34 +776,34 @@ async function createTables() {
 async function query(sql, params = []) {
   if (pool) {
     let pgSql = sql;
-    
+
     // Convert MySQL backticks to double quotes
     pgSql = pgSql.replace(/`/g, '"');
-    
+
     // Convert ? to $1, $2 etc.
     let i = 1;
-    pgSql = pgSql.replace(/\?/g, () => '$' + (i++));
-    
+    pgSql = pgSql.replace(/\?/g, () => `${i++}`);
+
     // Automatically append RETURNING id for INSERT queries if not present
     const isInsert = pgSql.trim().toUpperCase().startsWith('INSERT');
     if (isInsert && !pgSql.toUpperCase().includes('RETURNING')) {
       pgSql += ' RETURNING id';
     }
-    
+
     try {
       const res = await pool.query(pgSql, params);
       if (isInsert) {
-        return { 
+        return {
           insertId: res.rows && res.rows[0] ? res.rows[0].id : null,
-          affectedRows: res.rowCount 
+          affectedRows: res.rowCount
         };
       }
-      
+
       const isUpdateOrDelete = pgSql.trim().toUpperCase().startsWith('UPDATE') || pgSql.trim().toUpperCase().startsWith('DELETE');
       if (isUpdateOrDelete) {
         return { affectedRows: res.rowCount };
       }
-      
+
       return res.rows;
     } catch (e) {
       console.error('[DB ERROR] Query:', pgSql, 'Params:', params, 'Error:', e.message);
@@ -779,7 +830,7 @@ async function query(sql, params = []) {
   });
 
   // ==========================================
-  
+
   // ==========================================
   // PUBLIC CONTENT MATCHERS
   // ==========================================
@@ -789,11 +840,11 @@ async function query(sql, params = []) {
     if (type === 'hostel') return mockHostelRules;
     return [];
   }
-  
+
   if (normalized.includes('select * from wardendirectorycards')) {
     return mockWardenDirectory;
   }
-  
+
   if (normalized.startsWith('delete from policies where type = ?')) {
     const type = params[0];
     if (type === 'portal') mockPortalRules = [];
@@ -801,25 +852,25 @@ async function query(sql, params = []) {
     saveToFile();
     return { affectedRows: 1 };
   }
-  
+
   if (normalized.startsWith('insert into policies')) {
     const [id, type, title, desc] = params;
     const rule = { id, title, desc }; // Map DB column to mock state prop
-    if (type === 'portal') mockPortalRules.push({id, title, desc});
-    if (type === 'hostel') mockHostelRules.push({id, title, desc});
+    if (type === 'portal') mockPortalRules.push({ id, title, desc });
+    if (type === 'hostel') mockHostelRules.push({ id, title, desc });
     saveToFile();
     return { insertId: id };
   }
-  
+
   if (normalized.startsWith('delete from wardendirectorycards')) {
     mockWardenDirectory = [];
     saveToFile();
     return { affectedRows: 1 };
   }
-  
+
   if (normalized.startsWith('insert into wardendirectorycards')) {
     const [id, role, name, location, phone, email, color, initials] = params;
-    mockWardenDirectory.push({id, role, name, location, phone, email, color, initials});
+    mockWardenDirectory.push({ id, role, name, location, phone, email, color, initials });
     saveToFile();
     return { insertId: id };
   }
@@ -1448,7 +1499,7 @@ async function query(sql, params = []) {
     saveToFile();
     return { insertId: id };
   }
-  
+
   if (normalized.includes('from activitylogs')) {
     let logs = mockActivityLogs;
     if (normalized.includes('where role =')) {
@@ -1456,7 +1507,7 @@ async function query(sql, params = []) {
     }
     return logs.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
   }
-  
+
   if (normalized.startsWith('insert into passwordhistory')) {
     const [userId, role, hashedPassword] = params;
     const id = mockPasswordHistory.length + 1;
@@ -1464,12 +1515,12 @@ async function query(sql, params = []) {
     saveToFile();
     return { insertId: id };
   }
-  
+
   if (normalized.includes('from passwordhistory where userid =') && normalized.includes('and role =')) {
     return mockPasswordHistory.filter(x => x.userId === Number(params[0]) && x.role === params[1])
       .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
   }
-  
+
   if (normalized.startsWith('insert into qrpasses')) {
     const [leaveId, qrCode, expiryDate] = params;
     const id = mockQRPasses.length + 1;
@@ -1477,7 +1528,7 @@ async function query(sql, params = []) {
     saveToFile();
     return { insertId: id };
   }
-  
+
   if (normalized.startsWith('update qrpasses set status =')) {
     const [status, id] = params;
     const q = mockQRPasses.find(x => x.id === Number(id));
@@ -1488,18 +1539,18 @@ async function query(sql, params = []) {
     }
     return { affectedRows: 0 };
   }
-  
+
   if (normalized.includes('from qrpasses')) {
     return mockQRPasses.sort((a, b) => new Date(b.generatedAt) - new Date(a.generatedAt));
   }
-  
+
   if (normalized.includes('from hostels')) {
     if (normalized.includes('where id =')) {
       return mockHostels.filter(h => h.id === Number(params[0]));
     }
     return mockHostels;
   }
-  
+
   if (normalized.startsWith('insert into hostels')) {
     const [hostelName, capacity, occupiedRooms, wardenId] = params;
     const id = mockHostels.length + 1;
@@ -1507,7 +1558,7 @@ async function query(sql, params = []) {
     saveToFile();
     return { insertId: id };
   }
-  
+
   if (normalized.startsWith('update hostels set')) {
     const id = Number(params[params.length - 1]);
     const h = mockHostels.find(x => x.id === id);
@@ -1517,28 +1568,28 @@ async function query(sql, params = []) {
     }
     return { affectedRows: 0 };
   }
-  
+
   if (normalized.startsWith('delete from hostels')) {
     const id = Number(params[0]);
     const idx = mockHostels.findIndex(x => x.id === id);
     if (idx !== -1) { mockHostels.splice(idx, 1); saveToFile(); return { affectedRows: 1 }; }
     return { affectedRows: 0 };
   }
-  
+
   if (normalized.includes('from rooms')) {
     if (normalized.includes('where hostelid =')) {
       return mockRooms.filter(r => r.hostelId === Number(params[0]));
     }
     return mockRooms;
   }
-  
+
   if (normalized.startsWith('insert into rooms')) {
     const [roomNumber, hostelId, capacity, occupied] = params;
     const id = mockRooms.length + 1;
     mockRooms.push({ id, roomNumber, hostelId: Number(hostelId), capacity, occupied });
     saveToFile(); return { insertId: id };
   }
-  
+
   if (normalized.startsWith('update rooms set')) {
     const id = Number(params[params.length - 1]);
     const r = mockRooms.find(x => x.id === id);
@@ -1548,16 +1599,16 @@ async function query(sql, params = []) {
     }
     return { affectedRows: 0 };
   }
-  
+
   if (normalized.startsWith('delete from rooms')) {
     const id = Number(params[0]);
     const idx = mockRooms.findIndex(x => x.id === id);
     if (idx !== -1) { mockRooms.splice(idx, 1); saveToFile(); return { affectedRows: 1 }; }
     return { affectedRows: 0 };
   }
-  
+
   // --- SCREENS 41-48 MOCK QUERIES ---
-  
+
   // Roles
   if (normalized.includes('from roles')) {
     if (normalized.includes('where id =')) return mockRoles.filter(r => r.id === Number(params[0]));
@@ -1579,7 +1630,7 @@ async function query(sql, params = []) {
     if (idx !== -1) { mockRoles.splice(idx, 1); saveToFile(); return { affectedRows: 1 }; }
     return { affectedRows: 0 };
   }
-  
+
   // Attendance
   if (normalized.includes('from attendance')) {
     let att = mockAttendance;
@@ -1591,7 +1642,7 @@ async function query(sql, params = []) {
     mockAttendance.push({ id, studentId: Number(params[0]), checkInTime: params[1], checkOutTime: params[2], date: params[3], status: params[4] });
     saveToFile(); return { insertId: id };
   }
-  
+
   // Emergency Contacts
   if (normalized.includes('from emergencycontacts')) {
     if (normalized.includes('where studentid =')) return mockEmergencyContacts.filter(e => e.studentId === Number(params[0]));
@@ -1613,7 +1664,7 @@ async function query(sql, params = []) {
     if (idx !== -1) { mockEmergencyContacts.splice(idx, 1); saveToFile(); return { affectedRows: 1 }; }
     return { affectedRows: 0 };
   }
-  
+
   // Visitors
   if (normalized.includes('from visitors')) {
     return mockVisitors;
@@ -1634,7 +1685,7 @@ async function query(sql, params = []) {
     if (idx !== -1) { mockVisitors.splice(idx, 1); saveToFile(); return { affectedRows: 1 }; }
     return { affectedRows: 0 };
   }
-  
+
   // Room Allocations
   if (normalized.includes('from roomallocations')) {
     return mockRoomAllocations;
@@ -1650,7 +1701,7 @@ async function query(sql, params = []) {
     if (r) { r.roomId = Number(params[0]); saveToFile(); return { affectedRows: 1 }; }
     return { affectedRows: 0 };
   }
-  
+
   // Audit Logs
   if (normalized.includes('from auditlogs')) {
     return mockAuditLogs.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
@@ -1660,7 +1711,7 @@ async function query(sql, params = []) {
     mockAuditLogs.push({ id, userId: Number(params[0]), action: params[1], module: params[2], timestamp: new Date() });
     saveToFile(); return { insertId: id };
   }
-  
+
   // Announcements
   if (normalized.includes('from announcements')) {
     return mockAnnouncements.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
@@ -1681,7 +1732,7 @@ async function query(sql, params = []) {
     if (idx !== -1) { mockAnnouncements.splice(idx, 1); saveToFile(); return { affectedRows: 1 }; }
     return { affectedRows: 0 };
   }
-  
+
   // Custom Analytics Queries handled purely by returning mocked aggregations
   if (normalized.includes('select count(*) as active_leaves')) {
     return [{
