@@ -26,4 +26,4 @@ node_modules/
 .DS_Store
 
 # Local Mock Database (if you want to prevent wiping it on GitHub)
-config/db.json
+# config/db.json
