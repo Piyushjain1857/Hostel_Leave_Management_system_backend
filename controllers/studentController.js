@@ -29,18 +29,18 @@ const getDashboardData = async (req, res) => {
       [studentId]
     );
     const approvedCountResult = await db.query(
-      'SELECT COUNT(*) AS count FROM LeaveRequests WHERE studentId = ? AND status = \'Approved\'',
-      [studentId]
+      'SELECT COUNT(*) AS count FROM LeaveRequests WHERE studentId = ? AND status = ?',
+      [studentId, 'Approved']
     );
     const pendingCountResult = await db.query(
-      'SELECT COUNT(*) AS count FROM LeaveRequests WHERE studentId = ? AND status = \'Pending\'',
-      [studentId]
+      'SELECT COUNT(*) AS count FROM LeaveRequests WHERE studentId = ? AND status = ?',
+      [studentId, 'Pending']
     );
 
     const stats = {
-      total: totalCountResult[0].count || 0,
-      approved: approvedCountResult[0].count || 0,
-      pending: pendingCountResult[0].count || 0
+      total: totalCountResult[0]?.count !== undefined ? Number(totalCountResult[0].count) : totalCountResult.length,
+      approved: approvedCountResult[0]?.count !== undefined ? Number(approvedCountResult[0].count) : approvedCountResult.length,
+      pending: pendingCountResult[0]?.count !== undefined ? Number(pendingCountResult[0].count) : pendingCountResult.length
     };
 
     // 3. Fetch recent 5 leave requests

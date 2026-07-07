@@ -377,6 +377,7 @@ async function initializeDatabase() {
   } catch (error) {
     console.error('PostgreSQL Connection/Initialization Error:', error.message);
     console.log('🔄 Bypassing to fully persistent LOCAL FILE database mode (db.json).');
+    pool = null;
     loadFromFile();
   }
 }
