@@ -682,6 +682,7 @@ async function createTables() {
       await client.query('ALTER TABLE students ADD COLUMN IF NOT EXISTS hostelRoom VARCHAR(50)');
       await client.query('ALTER TABLE students ADD COLUMN IF NOT EXISTS profileImage TEXT');
       await client.query('ALTER TABLE students ADD COLUMN IF NOT EXISTS coverImage TEXT');
+      await client.query("ALTER TABLE Notifications ADD COLUMN IF NOT EXISTS status VARCHAR(50) DEFAULT 'Unread'");
     } catch (alterErr) {
       console.error('Minor schema update error (safe to ignore if columns exist):', alterErr.message);
     }
