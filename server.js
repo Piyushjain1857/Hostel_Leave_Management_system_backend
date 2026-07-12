@@ -48,7 +48,7 @@ const superAdminRoutes = require('./routes/superAdminRoutes');
 const announcementRoutes = require('./routes/announcementRoutes');
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5005;
 
 // Enable CORS so the React app can communicate with the backend
 app.use(cors());
@@ -182,7 +182,7 @@ app.use((err, req, res, next) => {
 // Initialize database and start the server
 async function startServer() {
   await db.initializeDatabase();
-  
+
   app.listen(PORT, () => {
     console.log(`🚀 API Server is running on port ${PORT}`);
     console.log(`📡 Access endpoints at http://localhost:${PORT}`);

@@ -13,7 +13,7 @@ const getDashboardData = async (req, res) => {
 
     // 1. Fetch Student Profile details
     const studentRows = await db.query(
-      'SELECT id, name, email, hostelRoom, profileImage, coverImage, created_at FROM students WHERE id = ?',
+      'SELECT id, name, email, hostelRoom, profileImage, coverImage FROM students WHERE id = ?',
       [studentId]
     );
 
