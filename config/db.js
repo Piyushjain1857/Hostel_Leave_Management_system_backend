@@ -676,6 +676,16 @@ async function createTables() {
       await client.query(q);
     }
 
+    // Safely add any new columns to students table in case it was created earlier without them
+    try {
+      console.log('Applying any missing schema updates to students table...');
+      await client.query('ALTER TABLE students ADD COLUMN IF NOT EXISTS hostelRoom VARCHAR(50)');
+      await client.query('ALTER TABLE students ADD COLUMN IF NOT EXISTS profileImage TEXT');
+      await client.query('ALTER TABLE students ADD COLUMN IF NOT EXISTS coverImage TEXT');
+    } catch (alterErr) {
+      console.error('Minor schema update error (safe to ignore if columns exist):', alterErr.message);
+    }
+
     // Seed default Student if empty
     const { rows: students } = await client.query('SELECT id FROM students LIMIT 1');
     if (students.length === 0) {
