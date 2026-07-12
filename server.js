@@ -162,9 +162,10 @@ app.use('/api/announcements', announcementRoutes);
 app.get('/api/seed-test-data', async (req, res) => {
   try {
     const db = require('./config/db');
-    if (!db.pool) return res.status(400).json({ message: 'PostgreSQL not configured.' });
+    const pool = db.getPool();
+    if (!pool) return res.status(400).json({ message: 'PostgreSQL not configured.' });
     
-    const client = await db.pool.connect();
+    const client = await pool.connect();
     const studentRes = await client.query("SELECT id FROM students WHERE email = 'student@college.edu'");
     const sId = studentRes.rows[0]?.id || 1;
 
