@@ -158,6 +158,47 @@ app.use('/api/audit-logs', auditLogRoutes);
 app.use('/api/superadmin', superAdminRoutes);
 app.use('/api/announcements', announcementRoutes);
 
+// Helper endpoint to force seed test data for all roles
+app.get('/api/seed-test-data', async (req, res) => {
+  try {
+    const db = require('./config/db');
+    if (!db.pool) return res.status(400).json({ message: 'PostgreSQL not configured.' });
+    
+    const client = await db.pool.connect();
+    const studentRes = await client.query("SELECT id FROM students WHERE email = 'student@college.edu'");
+    const sId = studentRes.rows[0]?.id || 1;
+
+    // 1. Leave Request (Approved & Out)
+    const l1 = await client.query(
+      "INSERT INTO LeaveRequests (studentId, reason, fromDate, toDate, destination, parentPhone, expectedTimeOut, expectedTimeIn, status, parentStatus, wardenStatus, finalStatus) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) RETURNING id",
+      [sId, 'Family wedding in hometown (Test)', '2026-08-10', '2026-08-15', 'Hometown', '9876543211', '09:00', '18:00', 'Out', 'Approved', 'Approved', 'Approved']
+    );
+
+    // Gate Log
+    await client.query("INSERT INTO GateLogs (studentId, leaveId, exitTime, status) VALUES ($1, $2, CURRENT_TIMESTAMP, $3)", [sId, l1.rows[0].id, 'Out']);
+
+    // 2. Leave Request (Pending)
+    await client.query(
+      "INSERT INTO LeaveRequests (studentId, reason, fromDate, toDate, destination, parentPhone, expectedTimeOut, expectedTimeIn, status, parentStatus, wardenStatus, finalStatus) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)",
+      [sId, 'Medical checkup (Test)', '2026-08-20', '2026-08-20', 'City Hospital', '9876543211', '10:00', '14:00', 'Pending', 'Pending', 'Pending', 'Pending']
+    );
+
+    // Announcements
+    await client.query("INSERT INTO Announcements (title, description, priority, postedBy) VALUES ($1, $2, $3, $4)", ['Test Bulletin', 'This is a seeded test announcement.', 'Normal', 'System']);
+
+    // Notifications
+    await client.query("INSERT INTO Notifications (title, message, role) VALUES ($1, $2, $3)", ['Test', 'Test Student Notification', 'student']);
+    await client.query("INSERT INTO Notifications (title, message, role) VALUES ($1, $2, $3)", ['Test', 'Test Warden Notification', 'warden']);
+    await client.query("INSERT INTO Notifications (title, message, role) VALUES ($1, $2, $3)", ['Test', 'Test Parent Notification', 'parent']);
+    
+    client.release();
+    res.json({ message: 'Test data seeded successfully! You can now check the dashboards.' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // Base route to check API status
 app.get('/', (req, res) => {
   res.json({
