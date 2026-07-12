@@ -792,7 +792,7 @@ async function createTables() {
     const { rows: leaves } = await client.query('SELECT id FROM LeaveRequests LIMIT 1');
     if (leaves.length === 0) {
       console.log('Seeding sample test data...');
-      
+
       const studentRes = await client.query("SELECT id FROM students WHERE email = 'student@college.edu'");
       const sId = studentRes.rows[0]?.id || 1;
 
