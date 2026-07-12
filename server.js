@@ -164,7 +164,7 @@ app.get('/api/seed-test-data', async (req, res) => {
     const db = require('./config/db');
     const pool = db.getPool();
     if (!pool) return res.status(400).json({ message: 'PostgreSQL not configured.' });
-    
+
     const client = await pool.connect();
     const studentRes = await client.query("SELECT id FROM students WHERE email = 'student@college.edu'");
     const sId = studentRes.rows[0]?.id || 1;
@@ -191,7 +191,7 @@ app.get('/api/seed-test-data', async (req, res) => {
     await client.query("INSERT INTO Notifications (title, message, role) VALUES ($1, $2, $3)", ['Test', 'Test Student Notification', 'student']);
     await client.query("INSERT INTO Notifications (title, message, role) VALUES ($1, $2, $3)", ['Test', 'Test Warden Notification', 'warden']);
     await client.query("INSERT INTO Notifications (title, message, role) VALUES ($1, $2, $3)", ['Test', 'Test Parent Notification', 'parent']);
-    
+
     client.release();
     res.json({ message: 'Test data seeded successfully! You can now check the dashboards.' });
   } catch (err) {
