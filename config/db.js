@@ -788,6 +788,58 @@ async function createTables() {
       }
     }
 
+    // Seed Sample Data (LeaveRequests, GateLogs, Announcements, Notifications)
+    const { rows: leaves } = await client.query('SELECT id FROM LeaveRequests LIMIT 1');
+    if (leaves.length === 0) {
+      console.log('Seeding sample test data...');
+      
+      const studentRes = await client.query("SELECT id FROM students WHERE email = 'student@college.edu'");
+      const sId = studentRes.rows[0]?.id || 1;
+
+      // 1. Leave Request (Approved & Out)
+      const l1 = await client.query(
+        "INSERT INTO LeaveRequests (studentId, reason, fromDate, toDate, destination, parentPhone, expectedTimeOut, expectedTimeIn, status, parentStatus, wardenStatus, finalStatus) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) RETURNING id",
+        [sId, 'Family wedding in hometown', '2026-08-10', '2026-08-15', 'Hometown', '9876543211', '09:00', '18:00', 'Out', 'Approved', 'Approved', 'Approved']
+      );
+
+      // Gate Log for Leave 1
+      await client.query(
+        "INSERT INTO GateLogs (studentId, leaveId, exitTime, status) VALUES ($1, $2, CURRENT_TIMESTAMP, $3)",
+        [sId, l1.rows[0].id, 'Out']
+      );
+
+      // 2. Leave Request (Pending)
+      await client.query(
+        "INSERT INTO LeaveRequests (studentId, reason, fromDate, toDate, destination, parentPhone, expectedTimeOut, expectedTimeIn, status, parentStatus, wardenStatus, finalStatus) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)",
+        [sId, 'Medical checkup at city hospital', '2026-08-20', '2026-08-20', 'City Hospital', '9876543211', '10:00', '14:00', 'Pending', 'Pending', 'Pending', 'Pending']
+      );
+
+      // Announcements
+      await client.query(
+        "INSERT INTO Announcements (title, description, priority, postedBy) VALUES ($1, $2, $3, $4)",
+        ['Important: Upcoming Holidays', 'All students must apply for outpasses at least 48 hours in advance for the upcoming long weekend.', 'High', 'Chief Warden']
+      );
+
+      // Notifications
+      await client.query(
+        "INSERT INTO Notifications (title, message, role) VALUES ($1, $2, $3)",
+        ['Welcome', 'Welcome to the new Digital Leave Portal!', 'all']
+      );
+      await client.query(
+        "INSERT INTO Notifications (title, message, role) VALUES ($1, $2, $3)",
+        ['Pending Approvals', 'You have new leave requests waiting for your approval.', 'warden']
+      );
+      await client.query(
+        "INSERT INTO Notifications (title, message, role) VALUES ($1, $2, $3)",
+        ['Leave Approved', 'Your leave request for hometown has been approved by the warden.', 'student']
+      );
+      await client.query(
+        "INSERT INTO Notifications (title, message, role) VALUES ($1, $2, $3)",
+        ['Action Required', 'Please review the pending outpass request for your ward.', 'parent']
+      );
+    }
+
+
     client.release();
     console.log('Database tables verified and seeded successfully.');
   } catch (error) {
