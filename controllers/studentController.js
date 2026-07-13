@@ -166,6 +166,10 @@ const getStudentProfile = async (req, res) => {
     }
 
     res.json(studentProfile);
+    console.log("--------------------------")
+    console.log("--------------------------")
+    console.log("--------------------------")
+    console.log('Fetched Student Profile:', studentProfile);
   } catch (error) {
     console.error('Get Student Profile Error:', error);
     res.status(500).json({ message: 'Internal server error fetching profile.' });
