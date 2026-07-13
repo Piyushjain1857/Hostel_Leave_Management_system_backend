@@ -1068,7 +1068,7 @@ async function query(sql, params = []) {
     }
     return { affectedRows: 0 };
   }
-  if (normalized.startsWith('update students set name =') && normalized.includes('profileimage =') && !normalized.includes('coverimage =')) {
+  if (normalized.startsWith('update students set name =') && normalized.includes('profileImage =') && !normalized.includes('coverImage =')) {
     const [name, email, phone, course, year, hostelRoom, profileImage, id] = params;
     const s = mockStudents.find(x => x.id === Number(id));
     if (s) {
@@ -1144,7 +1144,7 @@ async function query(sql, params = []) {
     saveToFile();
     return { insertId: id };
   }
-  if (normalized.startsWith('update wardens set name =') && normalized.includes('profileimage =')) {
+  if (normalized.startsWith('update wardens set name =') && normalized.includes('profileImage =')) {
     const [name, email, phone, hostelAssigned, shift, profileImage, id] = params;
     const w = mockWardens.find(x => x.id === Number(id));
     if (w) {
@@ -1214,7 +1214,7 @@ async function query(sql, params = []) {
     saveToFile();
     return { insertId: id };
   }
-  if (normalized.startsWith('update parents set name =') && normalized.includes('profileimage =')) {
+  if (normalized.startsWith('update parents set name =') && normalized.includes('profileImage =')) {
     const [name, email, phone, profileImage, id] = params;
     const p = mockParents.find(x => x.id === Number(id));
     if (p) {
