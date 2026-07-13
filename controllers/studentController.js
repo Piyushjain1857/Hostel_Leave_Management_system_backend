@@ -143,7 +143,7 @@ const getStudentProfile = async (req, res) => {
   try {
     const studentId = req.user.id;
     const rows = await db.query(
-      'SELECT id, name, email, phone, course, year, hostelRoom, profileImage, coverImage FROM students WHERE id = ?',
+      'SELECT id, name, email, phone, course, year, hostelRoom, profileImage as profileImage, coverImage FROM students WHERE id = ?',
       [studentId]
     );
 
