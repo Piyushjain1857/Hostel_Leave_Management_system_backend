@@ -165,18 +165,15 @@ const getStudentProfile = async (req, res) => {
       studentProfile.parentProfileImage = parentRows[0].parentProfileImage || parentRows[0].profileImage;
     }
     studentProfile.profileImage = studentProfile.profileImage || studentProfile.profileimage || '';
+    studentProfile.coverImage = studentProfile.coverImage || studentProfile.coverimage || '';
+    studentProfile.hostelRoom = studentProfile.hostelRoom || studentProfile.hostelroom || '';
     
     res.json(studentProfile);
-    console.log("--------------------------")
-    console.log("--------------------------")
-    console.log("--------------------------")
-    console.log('Fetched Student Profile:', studentProfile);
   } catch (error) {
     console.error('Get Student Profile Error:', error);
     res.status(500).json({ message: 'Internal server error fetching profile.' });
   }
 };
-
 /**
  * @desc    UPDATE student profile details
  * @route   PUT /student/profile
