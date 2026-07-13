@@ -154,7 +154,7 @@ const getStudentProfile = async (req, res) => {
     const studentProfile = rows[0];
 
     const parentRows = await db.query(
-      'SELECT name as parentName, email as parentEmail, phone as parentPhone, profileImage as parentProfileImage FROM Parents WHERE studentId = ?',
+      'SELECT name as parentName, email as parentEmail, phone as parentPhone, profileImage FROM Parents WHERE studentId = ?',
       [studentId]
     );
 
@@ -164,7 +164,8 @@ const getStudentProfile = async (req, res) => {
       studentProfile.parentPhone = parentRows[0].parentPhone || parentRows[0].phone;
       studentProfile.parentProfileImage = parentRows[0].parentProfileImage || parentRows[0].profileImage;
     }
-
+    studentProfile.profileImage = studentProfile.profileImage || studentProfile.profileimage || '';
+    
     res.json(studentProfile);
     console.log("--------------------------")
     console.log("--------------------------")
